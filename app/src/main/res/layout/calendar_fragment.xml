@@ -7,14 +7,6 @@
         android:layout_width="300dp"
         android:layout_height="440dp"
         android:background="#ccff99">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Here is some text"
-            android:textSize="40dp"
-            android:gravity="center" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
