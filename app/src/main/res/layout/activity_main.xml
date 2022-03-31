@@ -21,6 +21,14 @@
             android:text="Select Date" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/dailyImage"
+        android:src="@drawable/nasa_launch"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        app:layout_constraintBottom_toTopOf="@+id/selectedDate"
+        app:layout_constraintTop_toTopOf="@+id/linearLayout" />
+
     <TextView
         android:id="@+id/selectedDate"
         android:layout_width="match_parent"
