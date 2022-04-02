@@ -18,23 +18,28 @@
             android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
+            android:scaleType="fitXY"
             android:text="Select Date" />
     </LinearLayout>
 
     <ImageView
         android:id="@+id/dailyImage"
+        android:layout_width="330dp"
+        android:layout_height="220dp"
         android:src="@drawable/nasa_launch"
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
         app:layout_constraintBottom_toTopOf="@+id/selectedDate"
-        app:layout_constraintTop_toTopOf="@+id/linearLayout" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/linearLayout"
+        android:scaleType="fitXY"/>
 
     <TextView
         android:id="@+id/selectedDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
         android:gravity="center"
+        android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
