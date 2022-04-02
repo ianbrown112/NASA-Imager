@@ -29,25 +29,30 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.time.*;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Button button;
     Calendar calendar;
-    ImageView displayImage;
+    ImageView dailyImage;
+    String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         calendar = Calendar.getInstance();
-        String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=2020-02-12";
+
         setContentView(R.layout.activity_main);
         String defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
+
+        //get current year, month and day so default image is today's image
+        String today = LocalDate.now().toString();
 
         TextView dateText = findViewById(R.id.selectedDate);
         dateText.setText(defaultDate);
 
-        ImageView dailyImage = findViewById(R.id.dailyImage);
+        dailyImage = findViewById(R.id.dailyImage);
 
         button=findViewById(R.id.btn1);
 
@@ -61,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         });
 
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
-        dailyNASA_Image.execute(NASAurl);
+        dailyNASA_Image.execute(NASAurl + today);
 
     }
 
@@ -77,8 +82,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar.set(Calendar.MONTH, month);
         calendar.set(Calendar.DAY_OF_MONTH, day);
         String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
+
         TextView dateText = findViewById(R.id.selectedDate);
         dateText.setText(selectedDate);
+
+        /*convert selected date into proper format for API url
+        i.e YYYY-MM-DD
+         */
+        String API_Date = API_DateFormatter(year, month, day);
+
+        DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
+        dailyNASA_Image.execute(NASAurl + API_Date);
+
     }
 
     protected class DailyNASA_Image extends AsyncTask<String, String, String> {
@@ -126,9 +141,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         URL sp_url = new URL(imageURL);
 
                         String fileName = sp_url.getFile();
-//                    int lastIndex = fileName.lastIndexOf('/') + 1;
-//                    String parsedFileName = fileName.substring(lastIndex);
-//                    System.out.println("filename: " + parsedFileName);
 
                         String environment_directory = Environment.getExternalStorageDirectory().toString();
                         System.out.println("environment_directory: " + environment_directory);
@@ -158,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     } else {
                         System.out.println("file does exist in storage");
                     }
-                    //publishProgress(parsedFileName);
                     return parsedFileName;
                 } catch (Exception e) {
                     System.out.println(e);
@@ -177,30 +188,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 String path = directory + "/" + s;
                 System.out.println(path);
                 Bitmap bmImg = BitmapFactory.decodeFile(path);
+                dailyImage.setImageBitmap(bmImg);
                 System.out.println("bmImg is set");
                 System.out.println("Display image should be set");
 
             } catch (Exception e2) {
                 System.out.print(e2);
             }
-
         }
-        //overloading onProgressUpdate using try / catch technique
-        //based on following stackoverflow post:
-        //https://stackoverflow.com/questions/23251315/can-publishprogress-be-overloaded-in-asynctask
-
-//        protected void onProgressUpdate(String... values) {
-//            super.onProgressUpdate();
-//            //update progress bar if input is int
-//            try {
-//                String directory = String.valueOf(getExternalFilesDir(null));
-//                String path = directory + "/" + values[0];
-//                Bitmap bmImg = BitmapFactory.decodeFile(path);
-//                displayImage.setImageBitmap(bmImg);
-//                System.out.println("In try clause of onProgressUpdate");
-//            } catch (Exception e2) {
-//                System.out.print(e2);
-//            }
-//        }
+    }
+    /*convert selected date into proper format for API url
+    i.e YYYY-MM-DD */
+    String API_DateFormatter(int year, int month, int day) {
+        //bug where month is one less than proper index e.g March is set as 2, therefore add 1 to resolve
+        month = month+1;
+        String API_Date = Integer.toString(year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+        return API_Date;
     }
 }
