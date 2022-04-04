@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/microbe"
+        android:icon="@drawable/microbe"
+        android:title="Microbe"
+        app:showAsAction="always"
+        android:orderInCategory="400"/> <!-- This uses showAsAction=never, so look at title= parameter -->
+
+    <item android:id="@+id/penguin"
+        android:icon="@drawable/penguin"
+        android:orderInCategory="500"
+        app:showAsAction="always"
+        android:title="Penguin"
+        />
+
+</menu>

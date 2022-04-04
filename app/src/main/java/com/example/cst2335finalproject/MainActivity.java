@@ -1,5 +1,6 @@
 package com.example.cst2335finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -10,11 +11,18 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONObject;
 
@@ -31,7 +39,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.time.*;
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, NavigationView.OnNavigationItemSelectedListener {
 
     private Button button;
     Calendar calendar;
@@ -51,6 +59,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         TextView dateText = findViewById(R.id.selectedDate);
         dateText.setText(defaultDate);
+
+        //For toolbar:
+        Toolbar tBar = findViewById(R.id.toolbar);
+        setSupportActionBar(tBar);
 
         dailyImage = findViewById(R.id.dailyImage);
 
@@ -94,6 +106,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
         dailyNASA_Image.execute(NASAurl + API_Date);
 
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
     }
 
     protected class DailyNASA_Image extends AsyncTask<String, String, String> {
@@ -204,5 +221,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         month = month+1;
         String API_Date = Integer.toString(year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
         return API_Date;
+    }
+
+    public boolean onCreateOptionsMenu (Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.top_menu, menu);
+
+        return true;
     }
 }
