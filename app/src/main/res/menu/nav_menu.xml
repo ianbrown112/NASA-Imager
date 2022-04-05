@@ -6,8 +6,8 @@
         android:title="Home"
         app:showAsAction="always" />
 
-    <item android:id="@+id/dad_joke"
-        android:title="Dad Joke"
+    <item android:id="@+id/favourite"
+        android:title="Favourites"
         app:showAsAction="always" />
 
     <item android:id="@+id/exit"

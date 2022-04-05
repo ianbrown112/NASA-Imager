@@ -292,10 +292,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         switch(item.getItemId())
         {
-            case R.id.dad_joke:
-                Intent intent_joke = new Intent(this, MainActivity.class);
-                message = "You clicked Dad joke";
-                startActivity(intent_joke);
+            case R.id.favourite:
+                Intent intent_favs = new Intent(this, FavouritesList.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("favs", favNasaImages);
+                intent_favs.putExtras(bundle);
+                message = "You clicked on your favourites list";
+                startActivity(intent_favs);
                 break;
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);

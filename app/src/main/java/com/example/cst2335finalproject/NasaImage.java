@@ -1,6 +1,9 @@
 package com.example.cst2335finalproject;
 
-public class NasaImage {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class NasaImage implements Parcelable {
 
     private String parsedFileName;
     private String title;
@@ -33,5 +36,15 @@ public class NasaImage {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 }
