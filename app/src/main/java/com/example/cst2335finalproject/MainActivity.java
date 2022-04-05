@@ -2,10 +2,13 @@ package com.example.cst2335finalproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -20,6 +23,8 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
@@ -71,6 +76,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         Toolbar tBar = findViewById(R.id.toolbar);
         setSupportActionBar(tBar);
 
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,
+                drawer, tBar, R.string.open, R.string.close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         dailyImage = findViewById(R.id.dailyImage);
 
         imageTitle = findViewById(R.id.imageTitle);
@@ -97,13 +111,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onClick(View view) {
 
-                //add image to favourites ArrayList
-                favNasaImages.add(activeImage);
                 Iterator favImagesIterator = favNasaImages.iterator();
                 while (favImagesIterator.hasNext()) {
                     NasaImage nasaImage = (NasaImage) favImagesIterator.next();
                     System.out.println(nasaImage.getTitle());
+
+                    //if image is already in favourites list, exit method without adding it again
+                    if ( activeImage.getTitle().equals(nasaImage.getTitle()) ) {
+                        return;
+                    }
                 }
+                //otherwise, add image to favourites ArrayList
+                favNasaImages.add(activeImage);
             }
         });
 
@@ -136,11 +155,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
         dailyNASA_Image.execute(NASAurl + API_Date);
 
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
     }
 
     protected class DailyNASA_Image extends AsyncTask<String, String, NasaImage> {
@@ -270,5 +284,34 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         inflater.inflate(R.menu.top_menu, menu);
 
         return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        String message = null;
+
+        switch(item.getItemId())
+        {
+            case R.id.dad_joke:
+                Intent intent_joke = new Intent(this, MainActivity.class);
+                message = "You clicked Dad joke";
+                startActivity(intent_joke);
+                break;
+            case R.id.home:
+                Intent intent_home = new Intent(this, MainActivity.class);
+                message = "You clicked on the home";
+                startActivity(intent_home);
+                break;
+
+            case R.id.exit:
+                finishAffinity();
+                break;
+        }
+
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
+        return false;
     }
 }
