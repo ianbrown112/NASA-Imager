@@ -289,15 +289,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         String message = null;
-
+        message = "You clicked on your favourites list";
+        System.out.println(message);
         switch(item.getItemId())
         {
             case R.id.favourite:
+                System.out.println("------------you click on Favourites-----------");
                 Intent intent_favs = new Intent(this, FavouritesList.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("favs", favNasaImages);
                 intent_favs.putExtras(bundle);
-                message = "You clicked on your favourites list";
+                //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
             case R.id.home:
