@@ -31,7 +31,16 @@
             android:scaleType="fitXY"
             android:src="@drawable/nasa_launch" />
 
+        <TextView
+            android:id="@+id/imageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textSize="20sp"
+            android:gravity="center"/>
+
+
         <ImageButton
+            android:id="@+id/favourite"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/heart" />

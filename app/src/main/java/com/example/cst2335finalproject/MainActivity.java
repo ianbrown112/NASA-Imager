@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
@@ -36,14 +37,20 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.time.*;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, NavigationView.OnNavigationItemSelectedListener {
 
-    private Button button;
+    private Button dateSelectButton;
+    private ImageButton favButton;
+    ArrayList<NasaImage> favNasaImages;
     Calendar calendar;
     ImageView dailyImage;
+    TextView imageTitle;
+    NasaImage activeImage;
     String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
 
     @Override
@@ -66,14 +73,37 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         dailyImage = findViewById(R.id.dailyImage);
 
-        button=findViewById(R.id.btn1);
+        imageTitle = findViewById(R.id.imageTitle);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        dateSelectButton=findViewById(R.id.btn1);
+
+        dateSelectButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 DialogFragment calendarFragment = new CalendarFragment();
                 calendarFragment.show(getSupportFragmentManager(),"Calendar Fragment");
+            }
+        });
+
+        /*Set up favouriting function, with a button to add image to favourites
+        and an array list to hold favourited images
+         */
+        favNasaImages = new ArrayList<NasaImage>();
+
+        favButton = findViewById(R.id.favourite);
+
+        favButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //add image to favourites ArrayList
+                favNasaImages.add(activeImage);
+                Iterator favImagesIterator = favNasaImages.iterator();
+                while (favImagesIterator.hasNext()) {
+                    NasaImage nasaImage = (NasaImage) favImagesIterator.next();
+                    System.out.println(nasaImage.getTitle());
+                }
             }
         });
 
@@ -113,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return false;
     }
 
-    protected class DailyNASA_Image extends AsyncTask<String, String, String> {
-        protected String doInBackground(String ... args) {
+    protected class DailyNASA_Image extends AsyncTask<String, String, NasaImage> {
+        protected NasaImage doInBackground(String ... args) {
                 try {
 
                     //create a URL object of what server to contact:
@@ -139,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     //create JSON object with result
                     JSONObject imageInfo = new JSONObject(result);
 
+                    String title = imageInfo.getString("title");
                     String imageURL = imageInfo.getString("url");
 
                     int lastIndex = imageURL.lastIndexOf('/') + 1;
@@ -187,7 +218,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     } else {
                         System.out.println("file does exist in storage");
                     }
-                    return parsedFileName;
+
+                    NasaImage currentNasaImage = new NasaImage(title, parsedFileName);
+
+                    return currentNasaImage;
                 } catch (Exception e) {
                     System.out.println(e);
                     System.out.println(e.getStackTrace());
@@ -196,18 +230,26 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            //update progress bar if input is int
+        protected void onPostExecute(NasaImage currentImage) {
+            super.onPostExecute(currentImage);
+
             try {
                 System.out.println("In try clause of onPostExecute");
                 String directory = String.valueOf(getExternalFilesDir(null));
-                String path = directory + "/" + s;
+                String path = directory + "/" + currentImage.getParsedFileName();
+
+                currentImage.setFilePath(path);
+
                 System.out.println(path);
                 Bitmap bmImg = BitmapFactory.decodeFile(path);
                 dailyImage.setImageBitmap(bmImg);
+
+                imageTitle.setText(currentImage.getTitle());
+
                 System.out.println("bmImg is set");
                 System.out.println("Display image should be set");
+
+                activeImage = currentImage;
 
             } catch (Exception e2) {
                 System.out.print(e2);
