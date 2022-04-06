@@ -24,6 +24,7 @@ public class FavouritesList extends AppCompatActivity {
         Iterator favImagesIterator = favNasaImages.iterator();
         while (favImagesIterator.hasNext()) {
             NasaImage nasaImage = (NasaImage) favImagesIterator.next();
+            System.out.println("<<<<<< Your current favourites: ");
             System.out.println(nasaImage.getTitle());
         }
     }

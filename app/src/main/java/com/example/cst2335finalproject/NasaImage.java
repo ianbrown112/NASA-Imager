@@ -14,6 +14,12 @@ public class NasaImage implements Parcelable {
         this.parsedFileName = parsedFileName;
     }
 
+    public NasaImage(Parcel source) {
+        parsedFileName = source.readString();
+        title = source.readString();
+        filePath = source.readString();
+    }
+
     public String getParsedFileName() {
         return parsedFileName;
     }
@@ -45,6 +51,23 @@ public class NasaImage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-
+        parcel.writeString(parsedFileName);
+        parcel.writeString(title);
+        parcel.writeString(filePath);
     }
+    public static Parcelable.Creator<NasaImage> CREATOR = new MyCreator();
+}
+
+class MyCreator implements Parcelable.Creator<NasaImage> {
+
+    @Override
+    public NasaImage createFromParcel(Parcel source) {
+        return new NasaImage(source);
+    }
+
+    @Override
+    public NasaImage[] newArray(int size) {
+        return new NasaImage[size];
+    }
+
 }
