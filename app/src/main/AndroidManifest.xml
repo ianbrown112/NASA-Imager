@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CST2335FinalProject">
         <activity
+            android:name=".SelectedImage"
+            android:exported="false" />
+        <activity
             android:name=".FavouritesList"
             android:exported="false" />
         <activity
