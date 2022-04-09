@@ -7,14 +7,17 @@
 
     <TextView
         android:id="@+id/itemText"
+        android:layout_margin="5dp"
         android:layout_width="250dp"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
         android:textSize="20sp" />
 
     <Button
-        android:id="@+id/deleteBtn"
-        android:layout_width="100dp"
+        android:id="@+id/selectBtn"
+        android:layout_width="85dp"
         android:layout_height="50dp"
-        android:text="SELECT"/>
+        android:layout_margin="5dp"
+        android:textSize="10sp"
+        android:text="SELECT" />
 
 </LinearLayout>

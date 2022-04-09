@@ -51,6 +51,14 @@
                 android:textSize="10sp"
                 android:id="@+id/changeTitleBtn"/>
         </LinearLayout>
+        <Button
+            android:layout_width="125dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:backgroundTint="@color/tomato"
+            android:text="Unfavourite"
+            android:textSize="10sp"
+            android:id="@+id/unfavouriteBtn"/>
 
     </LinearLayout>
 

@@ -32,6 +32,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
     TextView selectedImageTitle;
     EditText editTitleBox;
     Button changeTitleBtn;
+    Button unfavouriteBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
         changeTitleBtn = findViewById(R.id.changeTitleBtn);
 
+        unfavouriteBtn = findViewById(R.id.unfavouriteBtn);
 
         Intent intent = getIntent();
 
@@ -66,8 +68,10 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
         favNasaImages = bundle.getParcelableArrayList("favs");
 
-        NasaImage selectedImage = bundle.getParcelable("selectedImage");
+        int imageIndex = bundle.getInt("imageIndex");
+        NasaImage selectedImage = favNasaImages.get(imageIndex);
 
+        //Create button to allow user to customize title of the image
         changeTitleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,6 +80,21 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
                 selectedImageTitle.setText(newTitle);
             }
         });
+
+        //Create button to allow removal of image from favourites and return to favourites list activity
+        unfavouriteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                favNasaImages.remove(imageIndex);
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("favs", favNasaImages);
+                Intent intent_favs = new Intent(SelectedImage.this, FavouritesList.class);
+                intent_favs.putExtras(bundle);
+                startActivity(intent_favs);
+            }
+        });
+
+
 
 
         try {
@@ -111,7 +130,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
             case R.id.favourite:
                 Intent intent_favs = new Intent(this, FavouritesList.class);
                 intent_favs.putExtras(bundle);
-                //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
             case R.id.home:

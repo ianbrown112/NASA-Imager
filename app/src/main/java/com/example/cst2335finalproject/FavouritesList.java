@@ -108,7 +108,7 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
             }
             //set what the text should be for this row:
             TextView tView = newView.findViewById(R.id.itemText);
-            Button selectBtn = (Button) newView.findViewById(R.id.deleteBtn);
+            Button selectBtn = (Button) newView.findViewById(R.id.selectBtn);
             NasaImage nasaImage;
             nasaImage = getItem(position);
             tView.setText( nasaImage.getTitle() );
@@ -117,7 +117,7 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
             selectBtn.setOnClickListener( click-> {
                 Intent selectedImage = new Intent(FavouritesList.this, SelectedImage.class);
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("selectedImage", nasaImage);
+                bundle.putInt("imageIndex", position);
                 bundle.putParcelableArrayList("favs", favNasaImages);
                 selectedImage.putExtras(bundle);
                 //message = "You clicked on your favourites list";
