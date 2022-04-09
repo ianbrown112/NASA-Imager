@@ -6,6 +6,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -63,10 +64,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //load any saved favourites from database
+        loadDataFromDatabase();
+
         calendar = Calendar.getInstance();
 
         setContentView(R.layout.activity_main);
-       defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
+        defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
 
         //get current year, month and day so default image is today's image
         String today = LocalDate.now().toString();
@@ -134,6 +139,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
                 //otherwise, add image to favourites ArrayList
                 favNasaImages.add(activeImage);
+
+                //and write information to the database
+                ContentValues newRowValues = new ContentValues();
+
+                newRowValues.put(DB_Opener.COL_FILENAME, activeImage.getParsedFileName());
+                newRowValues.put(DB_Opener.COL_TITLE, activeImage.getTitle());
+                newRowValues.put(DB_Opener.COL_PUBLISHED_DATE, activeImage.getPublishedDate());
+                newRowValues.put(DB_Opener.COL_EXPLANATION, activeImage.getExplanation());
+                newRowValues.put(DB_Opener.COL_FILEPATH, activeImage.getFilePath());
+
+                db.insert(DB_Opener.TABLE_NAME, null, newRowValues);
             }
         });
 
@@ -337,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //get a database connection:
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
-
+        System.out.println("------------------In load from database----------------");
 
         // We want to get all of the columns. Look at DB_Opener.java for the definitions:
         String [] columns = {DB_Opener.COL_ID,
@@ -398,10 +414,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //use cursor to iterate through each row and print out the values
         c.moveToFirst();
         while(!c.isAfterLast() ){
-            String id = c.getString( 0 );
-            String desc = c.getString(1);
-            String urgent = c.getString(2);
-            System.out.println("id: " + id + ", desc: " + desc + ", urgent: " + urgent);
+            String filename = c.getString(0);
+            String title = c.getString(1);
+            String filepath = c.getString(2);
+            String publishedDate = c.getString(3);
+            String explanation = c.getString(4);
+            System.out.println("filename: " + filename + ", title: " + title +
+                    ", filepath: " + filepath + ", publishedDate: " + publishedDate +
+                    ", explanation: " + explanation);
             c.moveToNext(); }
 
         //move cursor back to first row so it can be used to display within the app
