@@ -30,6 +30,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
     ArrayList<NasaImage> favNasaImages = new ArrayList<NasaImage>();
     ImageView selectedImageView;
     TextView selectedImageTitle;
+    TextView explanationView;
     EditText editTitleBox;
     Button changeTitleBtn;
     Button unfavouriteBtn;
@@ -55,6 +56,8 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         selectedImageView = findViewById(R.id.selectedImage);
 
         selectedImageTitle = findViewById(R.id.selectedImageTitle);
+
+        explanationView = findViewById(R.id.explanationView);
 
         editTitleBox = findViewById(R.id.editTitleBox);
 
@@ -96,18 +99,15 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
 
 
-
+        //Load all info from selected image into this activity;
         try {
             String directory = String.valueOf(getExternalFilesDir(null));
             String path = directory + "/" + selectedImage.getParsedFileName();
-
             selectedImage.setFilePath(path);
-
             Bitmap bmImg = BitmapFactory.decodeFile(path);
             selectedImageView.setImageBitmap(bmImg);
-
             selectedImageTitle.setText(selectedImage.getTitle());
-
+            explanationView.setText(selectedImage.getExplanation());
         } catch (Exception e2) {
             System.out.print(e2);
         }

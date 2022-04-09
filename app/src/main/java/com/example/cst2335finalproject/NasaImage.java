@@ -8,16 +8,22 @@ public class NasaImage implements Parcelable {
     private String parsedFileName;
     private String title;
     private String filePath;
+    private String publishedDate;
+    private String explanation;
 
-    NasaImage(String title, String parsedFileName) {
+    NasaImage(String title, String parsedFileName, String publishedDate, String explanation) {
         this.title = title;
         this.parsedFileName = parsedFileName;
+        this.publishedDate = publishedDate;
+        this.explanation = explanation;
     }
 
     public NasaImage(Parcel source) {
         parsedFileName = source.readString();
         title = source.readString();
         filePath = source.readString();
+        publishedDate = source.readString();
+        explanation = source.readString();
     }
 
     public String getParsedFileName() {
@@ -44,6 +50,22 @@ public class NasaImage implements Parcelable {
         this.filePath = filePath;
     }
 
+    public String getPublishedDate() {
+        return publishedDate;
+    }
+
+    public void setPublishedDate(String publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -54,6 +76,8 @@ public class NasaImage implements Parcelable {
         parcel.writeString(parsedFileName);
         parcel.writeString(title);
         parcel.writeString(filePath);
+        parcel.writeString(publishedDate);
+        parcel.writeString(explanation);
     }
     public static Parcelable.Creator<NasaImage> CREATOR = new MyCreator();
 }

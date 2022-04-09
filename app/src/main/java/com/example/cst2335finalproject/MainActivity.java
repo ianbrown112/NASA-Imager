@@ -1,14 +1,14 @@
 package com.example.cst2335finalproject;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -53,9 +53,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     private ImageButton favButton;
     ArrayList<NasaImage> favNasaImages = new ArrayList<NasaImage>();
     Calendar calendar;
-    ImageView dailyImage;
-    TextView imageTitle;
+    ImageView dailyImageView;
+    TextView imageTitleView;
     NasaImage activeImage;
+    String defaultDate;
+    SQLiteDatabase db;
     String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
 
     @Override
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         calendar = Calendar.getInstance();
 
         setContentView(R.layout.activity_main);
-        String defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
+       defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
 
         //get current year, month and day so default image is today's image
         String today = LocalDate.now().toString();
@@ -85,9 +87,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dailyImage = findViewById(R.id.dailyImage);
+        dailyImageView = findViewById(R.id.dailyImage);
 
-        imageTitle = findViewById(R.id.imageTitle);
+        imageTitleView = findViewById(R.id.imageTitle);
 
         dateSelectButton=findViewById(R.id.btn1);
 
@@ -194,10 +196,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                     String title = imageInfo.getString("title");
                     String imageURL = imageInfo.getString("url");
+                    String publishedDate = imageInfo.getString("date");
+                    String explanation = imageInfo.getString("explanation");
+
+                    System.out.println("title: " + title);
+                    System.out.println("url: " + url);
+                    System.out.println("date: " + publishedDate);
+                    System.out.println("explanation: " + explanation);
 
                     int lastIndex = imageURL.lastIndexOf('/') + 1;
                     String parsedFileName = imageURL.substring(lastIndex);
-                    System.out.println("filename: " + parsedFileName);
 
                     //check if picture is already saved to drive
 
@@ -242,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         System.out.println("file does exist in storage");
                     }
 
-                    NasaImage currentNasaImage = new NasaImage(title, parsedFileName);
+                    NasaImage currentNasaImage = new NasaImage(title, parsedFileName, publishedDate, explanation);
 
                     return currentNasaImage;
                 } catch (Exception e) {
@@ -264,9 +272,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 System.out.println(path);
                 Bitmap bmImg = BitmapFactory.decodeFile(path);
-                dailyImage.setImageBitmap(bmImg);
+                
+                dailyImageView.setImageBitmap(bmImg);
 
-                imageTitle.setText(currentImage.getTitle());
+                imageTitleView.setText(currentImage.getTitle());
 
                 activeImage = currentImage;
 
@@ -278,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     /*convert selected date into proper format for API url
     i.e YYYY-MM-DD */
     String API_DateFormatter(int year, int month, int day) {
-        //bug where month is one less than proper index e.g March is set as 2, therefore add 1 to resolve
+        //months are zero-indexed so january=0, add 1 to make compatible index e.g March is set as 2, therefore add 1 to resolve
         month = month+1;
         String API_Date = Integer.toString(year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
         return API_Date;
@@ -321,5 +330,83 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
+    }
+
+    private void loadDataFromDatabase()
+    {
+        //get a database connection:
+        DB_Opener dbOpener = new DB_Opener(this);
+        db = dbOpener.getWritableDatabase();
+
+
+        // We want to get all of the columns. Look at DB_Opener.java for the definitions:
+        String [] columns = {DB_Opener.COL_ID,
+                DB_Opener.COL_FILENAME,
+                DB_Opener.COL_TITLE,
+                DB_Opener.COL_FILEPATH,
+                DB_Opener.COL_PUBLISHED_DATE,
+                DB_Opener.COL_EXPLANATION};
+        //query all the results from the database:
+        Cursor results = db.query(false, DB_Opener.TABLE_NAME, columns, null, null, null, null, null, null);
+
+        printCursor(results);
+        //Now the results object has rows of results that match the query.
+        //find the column indices:
+        int filenameColIndex = results.getColumnIndex(DB_Opener.COL_FILENAME);
+        int titleColIndex = results.getColumnIndex(DB_Opener.COL_TITLE);
+        int filepathColIndex = results.getColumnIndex(DB_Opener.COL_FILEPATH);
+        int publishedDateColIndex = results.getColumnIndex(DB_Opener.COL_PUBLISHED_DATE);
+        int explanationColIndex = results.getColumnIndex(DB_Opener.COL_EXPLANATION);
+        int idColIndex = results.getColumnIndex(DB_Opener.COL_ID);
+
+        //iterate over the results, return true if there is a next item:
+        while(results.moveToNext())
+        {
+            String filename = results.getString(filenameColIndex);
+            String title = results.getString(titleColIndex);
+            String filepath = results.getString(filepathColIndex);
+            String publishedDate = results.getString(publishedDateColIndex);
+            String explanation = results.getString(explanationColIndex);
+            long id = results.getLong(idColIndex);
+
+            //add the new ToDoItem to the array list:
+            NasaImage nasaImageFromDB = new NasaImage(title, filename, publishedDate, explanation);
+            nasaImageFromDB.setFilePath(filepath);
+            favNasaImages.add(nasaImageFromDB);
+        }
+    }
+
+    private void printCursor(Cursor c) {
+
+        System.out.println("-------DEBUG INFO START-------");
+        //print db version from static db attribute in MainActivity
+        System.out.println("db version: " + db.getVersion());
+
+        //get number of columns
+        int cols = c.getColumnCount();
+        System.out.println("number of columns: " + cols);
+
+        //get names of columns
+        for (int i=0; i<cols; i++) {
+            System.out.println("column names: " + c.getColumnName(i));
+        }
+
+        //get number of results
+        int results = c.getCount();
+        System.out.println("total number of results: " + results);
+
+        //use cursor to iterate through each row and print out the values
+        c.moveToFirst();
+        while(!c.isAfterLast() ){
+            String id = c.getString( 0 );
+            String desc = c.getString(1);
+            String urgent = c.getString(2);
+            System.out.println("id: " + id + ", desc: " + desc + ", urgent: " + urgent);
+            c.moveToNext(); }
+
+        //move cursor back to first row so it can be used to display within the app
+        c.moveToPosition(-1);
+
+        System.out.println("-------DEBUG INFO END-------");
     }
 }
