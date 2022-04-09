@@ -248,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             super.onPostExecute(currentImage);
 
             try {
-                System.out.println("In try clause of onPostExecute");
                 String directory = String.valueOf(getExternalFilesDir(null));
                 String path = directory + "/" + currentImage.getParsedFileName();
 
@@ -259,9 +258,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 dailyImage.setImageBitmap(bmImg);
 
                 imageTitle.setText(currentImage.getTitle());
-
-                System.out.println("bmImg is set");
-                System.out.println("Display image should be set");
 
                 activeImage = currentImage;
 
