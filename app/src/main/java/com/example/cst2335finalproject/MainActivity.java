@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     private Button dateSelectButton;
     private ImageButton favButton;
-    ArrayList<NasaImage> favNasaImages;
+    ArrayList<NasaImage> favNasaImages = new ArrayList<NasaImage>();
     Calendar calendar;
     ImageView dailyImage;
     TextView imageTitle;
@@ -103,7 +103,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         /*Set up favouriting function, with a button to add image to favourites
         and an array list to hold favourited images
          */
-        favNasaImages = new ArrayList<NasaImage>();
+
+        try {
+            Intent intent = getIntent();
+
+            Bundle bundle = intent.getExtras();
+
+            favNasaImages = bundle.getParcelableArrayList("favs");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         favButton = findViewById(R.id.favourite);
 
@@ -285,18 +294,19 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         String message = null;
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("favs", favNasaImages);
         switch(item.getItemId())
         {
             case R.id.favourite:
                 Intent intent_favs = new Intent(this, FavouritesList.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("favs", favNasaImages);
                 intent_favs.putExtras(bundle);
                 //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
+                intent_home.putExtras(bundle);
                 message = "You clicked on the home";
                 startActivity(intent_home);
                 break;

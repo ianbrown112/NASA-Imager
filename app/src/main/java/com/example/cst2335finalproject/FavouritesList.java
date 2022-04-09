@@ -138,18 +138,19 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         String message = null;
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("favs", favNasaImages);
         switch(item.getItemId())
         {
             case R.id.favourite:
                 Intent intent_favs = new Intent(this, FavouritesList.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("favs", favNasaImages);
                 intent_favs.putExtras(bundle);
                 //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
+                intent_home.putExtras(bundle);
                 message = "You clicked on the home";
                 startActivity(intent_home);
                 break;
