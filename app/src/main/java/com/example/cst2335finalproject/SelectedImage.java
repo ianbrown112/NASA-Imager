@@ -14,6 +14,9 @@ import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,6 +30,8 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
     ArrayList<NasaImage> favNasaImages = new ArrayList<NasaImage>();
     ImageView selectedImageView;
     TextView selectedImageTitle;
+    EditText editTitleBox;
+    Button changeTitleBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,11 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
         selectedImageTitle = findViewById(R.id.selectedImageTitle);
 
+        editTitleBox = findViewById(R.id.editTitleBox);
+
+        changeTitleBtn = findViewById(R.id.changeTitleBtn);
+
+
         Intent intent = getIntent();
 
         Bundle bundle =  intent.getExtras();
@@ -57,7 +67,16 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         favNasaImages = bundle.getParcelableArrayList("favs");
 
         NasaImage selectedImage = bundle.getParcelable("selectedImage");
-        System.out.println(selectedImage.getTitle());
+
+        changeTitleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String newTitle = String.valueOf(editTitleBox.getText());
+                selectedImage.setTitle(newTitle);
+                selectedImageTitle.setText(newTitle);
+            }
+        });
+
 
         try {
             String directory = String.valueOf(getExternalFilesDir(null));
@@ -65,7 +84,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
             selectedImage.setFilePath(path);
 
-            System.out.println(path);
             Bitmap bmImg = BitmapFactory.decodeFile(path);
             selectedImageView.setImageBitmap(bmImg);
 
