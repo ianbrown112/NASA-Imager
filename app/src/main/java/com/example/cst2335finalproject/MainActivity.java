@@ -150,6 +150,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 newRowValues.put(DB_Opener.COL_FILEPATH, activeImage.getFilePath());
 
                 db.insert(DB_Opener.TABLE_NAME, null, newRowValues);
+
+                //reload from database to get auto-generated ID for new favourited image
+                loadDataFromDatabase();
             }
         });
 
@@ -385,9 +388,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             String explanation = results.getString(explanationColIndex);
             long id = results.getLong(idColIndex);
 
-            //add the new ToDoItem to the array list:
+            //add the new image to the array list:
             NasaImage nasaImageFromDB = new NasaImage(title, filename, publishedDate, explanation);
             nasaImageFromDB.setFilePath(filepath);
+            nasaImageFromDB.setId(id);
             favNasaImages.add(nasaImageFromDB);
         }
     }
@@ -414,14 +418,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //use cursor to iterate through each row and print out the values
         c.moveToFirst();
         while(!c.isAfterLast() ){
-            String filename = c.getString(0);
-            String title = c.getString(1);
-            String filepath = c.getString(2);
-            String publishedDate = c.getString(3);
-            String explanation = c.getString(4);
-            System.out.println("filename: " + filename + ", title: " + title +
-                    ", filepath: " + filepath + ", publishedDate: " + publishedDate +
-                    ", explanation: " + explanation);
+            int id = c.getInt(0);
+            String filename = c.getString(1);
+            String title = c.getString(2);
+            String filepath = c.getString(3);
+            String publishedDate = c.getString(4);
+            String explanation = c.getString(5);
+            System.out.println("id: " + id + "filename: " + filename + ", title: " + title +
+                    ", filepath: " + filepath + ", publishedDate: " + publishedDate);
             c.moveToNext(); }
 
         //move cursor back to first row so it can be used to display within the app

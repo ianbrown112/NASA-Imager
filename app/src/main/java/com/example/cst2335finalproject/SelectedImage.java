@@ -7,6 +7,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
     EditText editTitleBox;
     Button changeTitleBtn;
     Button unfavouriteBtn;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +87,11 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         });
 
         //Create button to allow removal of image from favourites and return to favourites list activity
+        //also removes favourite from table in database
         unfavouriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                deleteImage(selectedImage);
                 favNasaImages.remove(imageIndex);
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("favs", favNasaImages);
@@ -150,4 +154,20 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
+
+    //method to delete image from database
+    protected void deleteImage(NasaImage image)
+    {
+        DB_Opener dbOpener = new DB_Opener(this);
+        db = dbOpener.getWritableDatabase();
+        System.out.println(image.getTitle());
+        System.out.println(image.getId());
+        System.out.println("-----------------in deleteImage()-----------------");
+        //db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_PUBLISHED_DATE + "= ?", new String[] {image.getPublishedDate()});
+        try {
+            db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_ID + "= ?", new String[]{Long.toString(image.getId())});
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        }
 }

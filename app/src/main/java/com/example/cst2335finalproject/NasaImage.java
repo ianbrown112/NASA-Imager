@@ -10,6 +10,7 @@ public class NasaImage implements Parcelable {
     private String filePath;
     private String publishedDate;
     private String explanation;
+    private long id;
 
     NasaImage(String title, String parsedFileName, String publishedDate, String explanation) {
         this.title = title;
@@ -24,6 +25,7 @@ public class NasaImage implements Parcelable {
         filePath = source.readString();
         publishedDate = source.readString();
         explanation = source.readString();
+        id = source.readLong();
     }
 
     public String getParsedFileName() {
@@ -66,6 +68,14 @@ public class NasaImage implements Parcelable {
         this.explanation = explanation;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -78,6 +88,7 @@ public class NasaImage implements Parcelable {
         parcel.writeString(filePath);
         parcel.writeString(publishedDate);
         parcel.writeString(explanation);
+        parcel.writeLong(id);
     }
     public static Parcelable.Creator<NasaImage> CREATOR = new MyCreator();
 }
