@@ -1,11 +1,5 @@
 package com.example.cst2335finalproject;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-
-import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,15 +13,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -42,22 +38,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.time.*;
 import java.util.Iterator;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, NavigationView.OnNavigationItemSelectedListener {
+public class RandomImage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Button dateSelectButton;
     private ImageButton favButton;
     ArrayList<NasaImage> favNasaImages = new ArrayList<NasaImage>();
-    Calendar calendar;
-    ImageView dailyImageView;
+    ImageView randomImageView;
     TextView imageTitleView;
     NasaImage activeImage;
-    String defaultDate;
+    ProgressBar progressBar;
     SQLiteDatabase db;
     String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
 
@@ -65,19 +59,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.out.println(randomDateGenerator());
+        System.out.println(randomDateGenerator());
+        System.out.println(randomDateGenerator());
+        System.out.println(randomDateGenerator());
         //load any saved favourites from database
         loadDataFromDatabase(false);
 
-        calendar = Calendar.getInstance();
-
-        setContentView(R.layout.activity_main);
-        defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
+        setContentView(R.layout.activity_random_image);
 
         //get current year, month and day so default image is today's image
         String today = LocalDate.now().toString();
 
-        TextView dateText = findViewById(R.id.selectedDate);
-        dateText.setText(defaultDate);
+        //TextView dateText = findViewById(R.id.selectedDate);
+        //dateText.setText(defaultDate);
 
         //For toolbar:
         Toolbar tBar = findViewById(R.id.toolbar);
@@ -92,21 +87,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dailyImageView = findViewById(R.id.dailyImage);
+        randomImageView = findViewById(R.id.randomImage);
 
         imageTitleView = findViewById(R.id.imageTitle);
 
-        dateSelectButton=findViewById(R.id.btn1);
-
-        dateSelectButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                DialogFragment calendarFragment = new CalendarFragment();
-                calendarFragment.show(getSupportFragmentManager(),"Calendar Fragment");
-            }
-        });
-
+        progressBar = findViewById(R.id.progressBar);
         /*Set up favouriting function, with a button to add image to favourites
         and an array list to hold favourited images
          */
@@ -121,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             System.out.println(e);
         }
 
-        favButton = findViewById(R.id.favourite);
+        favButton = findViewById(R.id.favouriteRandom);
 
         favButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
-        DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
-        dailyNASA_Image.execute(NASAurl + today);
+        RandomNasaImage RandomNASA_Image = new RandomNasaImage();
+        RandomNASA_Image.execute(NASAurl);
 
     }
 
@@ -161,34 +146,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
      "DatePickerDialog - Android Studio Tutorial" by Coding in Flow
      Selecting date from calendar updates text box with given date
      */
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int day) {
 
-        calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
-
-        TextView dateText = findViewById(R.id.selectedDate);
-        dateText.setText(selectedDate);
-
-        /*convert selected date into proper format for API url
-        i.e YYYY-MM-DD
-         */
-        String API_Date = API_DateFormatter(year, month, day);
-
-        DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
-        dailyNASA_Image.execute(NASAurl + API_Date);
-
-    }
-
-    protected class DailyNASA_Image extends AsyncTask<String, String, NasaImage> {
-        protected NasaImage doInBackground(String ... args) {
+    protected class RandomNasaImage extends AsyncTask<String, String, String> {
+        protected String doInBackground(String ... args) {
+            while ( true ) {
                 try {
 
+                    System.out.println("---------------------------in doInBackground-----------------");
                     //create a URL object of what server to contact:
-                    URL url = new URL(args[0]);
+
+                    String randomUrl = args[0] + randomDateGenerator();
+                    URL url = new URL(randomUrl);
 
                     //open the connection
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -259,39 +227,74 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     } else {
                         System.out.println("file does exist in storage");
                     }
-
+                    for (int i = 0; i < 100; i++) {
+                        try {
+                            String str_i = String.valueOf(i);
+                            publishProgress(str_i);
+                            Thread.sleep(10);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    //update ImageView to show new cat
                     NasaImage currentNasaImage = new NasaImage(title, parsedFileName, publishedDate, explanation);
+                    String path = directory + "/" + parsedFileName;
+                    currentNasaImage.setFilePath(path);
+                    System.out.println("--------------file path: " + currentNasaImage.getFilePath());
+                    publishProgress(currentNasaImage.getFilePath());
 
-                    return currentNasaImage;
+                    //reset progress bar to 0
+                    progressBar.setProgress(0);
                 } catch (Exception e) {
                     System.out.println(e);
                     System.out.println(e.getStackTrace());
                 }
-             return null;
+            }
         }
 
-        @Override
-        protected void onPostExecute(NasaImage currentImage) {
-            super.onPostExecute(currentImage);
+//        @Override
+//        protected void onPostExecute(NasaImage currentImage) {
+//            super.onPostExecute(currentImage);
+//
+//            try {
+//                String directory = String.valueOf(getExternalFilesDir(null));
+//                String path = directory + "/" + currentImage.getParsedFileName();
+//
+//                currentImage.setFilePath(path);
+//                Bitmap bmImg = BitmapFactory.decodeFile(path);
+//
+//                randomImageView.setImageBitmap(bmImg);
+//
+//                imageTitleView.setText(currentImage.getTitle());
+//
+//                activeImage = currentImage;
+//
+//            } catch (Exception e2) {
+//                System.out.print(e2);
+//            }
+//        }
 
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate();
+            //update progress bar if input is int
             try {
-                String directory = String.valueOf(getExternalFilesDir(null));
-                String path = directory + "/" + currentImage.getParsedFileName();
+                int i = Integer.parseInt(values[0]);
+                progressBar.setProgress(i);
+                //load new cat picture if string
 
-                currentImage.setFilePath(path);
-                Bitmap bmImg = BitmapFactory.decodeFile(path);
-                
-                dailyImageView.setImageBitmap(bmImg);
-
-                imageTitleView.setText(currentImage.getTitle());
-
-                activeImage = currentImage;
-
-            } catch (Exception e2) {
-                System.out.print(e2);
+            } catch (NumberFormatException e) {
+                try {
+                    String path = values[0];
+                    Bitmap bmImg = BitmapFactory.decodeFile(path);
+                    randomImageView.setImageBitmap(bmImg);
+                } catch (Exception e2) {
+                    System.out.print(e2);
+                }
             }
         }
     }
+
+
     /*convert selected date into proper format for API url
     i.e YYYY-MM-DD */
     String API_DateFormatter(int year, int month, int day) {
@@ -299,6 +302,20 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         month = month+1;
         String API_Date = Integer.toString(year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
         return API_Date;
+    }
+
+    /* return a date between Jun 16, 1995 and today
+    * generating random date based on this post from StackOverflow:
+    * https://stackoverflow.com/questions/40253332/generating-random-date-in-a-specific-range-in-java
+    * */
+
+    String randomDateGenerator() {
+        LocalDate d1 = LocalDate.of(1995, 6, 16);
+        LocalDate d2 = LocalDate.now();
+        int days = (int) Duration.between(d1.atStartOfDay(), d2.atStartOfDay()).toDays();
+        LocalDate randomDate = d1.plusDays(
+                ThreadLocalRandom.current().nextInt(days+1));
+        return randomDate.toString();
     }
 
     public boolean onCreateOptionsMenu (Menu menu) {
@@ -326,13 +343,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 intent_home.putExtras(bundle);
                 message = "You clicked on the home";
                 startActivity(intent_home);
-                break;
-
-            case R.id.random:
-                Intent intent_random = new Intent(this, RandomImage.class);
-                intent_random.putExtras(bundle);
-                //message = "You clicked on your favourites list";
-                startActivity(intent_random);
                 break;
 
             case R.id.exit:

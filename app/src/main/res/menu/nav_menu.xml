@@ -10,6 +10,10 @@
         android:title="Favourites"
         app:showAsAction="always" />
 
+    <item android:id="@+id/random"
+        android:title="Random"
+        app:showAsAction="always" />
+
     <item android:id="@+id/exit"
         android:title="Exit"
         app:showAsAction="always" />
