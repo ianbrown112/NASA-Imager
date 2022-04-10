@@ -29,8 +29,10 @@
         <ImageView
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/randomImage"/>
+            android:layout_height="250dp"
+            android:adjustViewBounds="true"
+            android:id="@+id/randomImage"
+            android:src="@drawable/random_title"/>
 
         <ImageButton
             android:id="@+id/favouriteRandom"

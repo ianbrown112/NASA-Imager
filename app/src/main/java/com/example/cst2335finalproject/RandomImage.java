@@ -42,6 +42,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomImage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +53,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
     TextView imageTitleView;
     NasaImage activeImage;
     ProgressBar progressBar;
+    boolean isRunning;
     SQLiteDatabase db;
     String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
 
@@ -59,10 +61,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        System.out.println(randomDateGenerator());
-        System.out.println(randomDateGenerator());
-        System.out.println(randomDateGenerator());
-        System.out.println(randomDateGenerator());
+        isRunning = true;
         //load any saved favourites from database
         loadDataFromDatabase(false);
 
@@ -139,17 +138,11 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
 
         RandomNasaImage RandomNASA_Image = new RandomNasaImage();
         RandomNASA_Image.execute(NASAurl);
-
     }
-
-    /*Calendar code based on tutorial @ https://www.youtube.com/watch?v=33BFCdL0Di0&t=338s
-     "DatePickerDialog - Android Studio Tutorial" by Coding in Flow
-     Selecting date from calendar updates text box with given date
-     */
 
     protected class RandomNasaImage extends AsyncTask<String, String, String> {
         protected String doInBackground(String ... args) {
-            while ( true ) {
+            while ( isRunning ) {
                 try {
 
                     System.out.println("---------------------------in doInBackground-----------------");
@@ -198,13 +191,6 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                         System.out.println("file does not exist in storage");
                         URL sp_url = new URL(imageURL);
 
-                        String fileName = sp_url.getFile();
-
-                        String environment_directory = Environment.getExternalStorageDirectory().toString();
-
-                        //open the connection
-                        HttpURLConnection sp_urlConnection = (HttpURLConnection) sp_url.openConnection();
-
                         //wait for data:
 
                         int count;
@@ -243,6 +229,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                     System.out.println("--------------file path: " + currentNasaImage.getFilePath());
                     publishProgress(currentNasaImage.getFilePath());
 
+                    activeImage = currentNasaImage;
                     //reset progress bar to 0
                     progressBar.setProgress(0);
                 } catch (Exception e) {
@@ -250,29 +237,8 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                     System.out.println(e.getStackTrace());
                 }
             }
+            return null;
         }
-
-//        @Override
-//        protected void onPostExecute(NasaImage currentImage) {
-//            super.onPostExecute(currentImage);
-//
-//            try {
-//                String directory = String.valueOf(getExternalFilesDir(null));
-//                String path = directory + "/" + currentImage.getParsedFileName();
-//
-//                currentImage.setFilePath(path);
-//                Bitmap bmImg = BitmapFactory.decodeFile(path);
-//
-//                randomImageView.setImageBitmap(bmImg);
-//
-//                imageTitleView.setText(currentImage.getTitle());
-//
-//                activeImage = currentImage;
-//
-//            } catch (Exception e2) {
-//                System.out.print(e2);
-//            }
-//        }
 
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate();
@@ -294,27 +260,18 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
-
-    /*convert selected date into proper format for API url
-    i.e YYYY-MM-DD */
-    String API_DateFormatter(int year, int month, int day) {
-        //months are zero-indexed so january=0, add 1 to make compatible index e.g March is set as 2, therefore add 1 to resolve
-        month = month+1;
-        String API_Date = Integer.toString(year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
-        return API_Date;
-    }
-
     /* return a date between Jun 16, 1995 and today
     * generating random date based on this post from StackOverflow:
     * https://stackoverflow.com/questions/40253332/generating-random-date-in-a-specific-range-in-java
     * */
 
     String randomDateGenerator() {
+        Random rand = new Random();
         LocalDate d1 = LocalDate.of(1995, 6, 16);
         LocalDate d2 = LocalDate.now();
         int days = (int) Duration.between(d1.atStartOfDay(), d2.atStartOfDay()).toDays();
         LocalDate randomDate = d1.plusDays(
-                ThreadLocalRandom.current().nextInt(days+1));
+                rand.nextInt(days+1));
         return randomDate.toString();
     }
 
@@ -327,6 +284,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        isRunning = false;
         String message = null;
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("favs", favNasaImages);
