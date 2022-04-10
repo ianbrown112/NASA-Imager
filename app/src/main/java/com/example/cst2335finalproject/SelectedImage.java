@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -83,6 +84,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
                 String newTitle = String.valueOf(editTitleBox.getText());
                 selectedImage.setTitle(newTitle);
                 selectedImageTitle.setText(newTitle);
+                updateImageTitle(selectedImage);
             }
         });
 
@@ -169,5 +171,22 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    //method to update image title in database
+    protected void updateImageTitle(NasaImage image)
+    {
+        DB_Opener dbOpener = new DB_Opener(this);
+        db = dbOpener.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("TITLE", image.getTitle());
+        System.out.println(image.getTitle());
+        System.out.println(image.getId());
+        System.out.println("-----------------in updateImageTitle()-----------------");
+        //db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_PUBLISHED_DATE + "= ?", new String[] {image.getPublishedDate()});
+        try {
+            db.update(DB_Opener.TABLE_NAME, cv, DB_Opener.COL_ID + "= ?", new String[]{Long.toString(image.getId())});
+        } catch (Exception e) {
+            System.out.println(e);
         }
+    }
 }
