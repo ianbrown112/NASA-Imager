@@ -162,10 +162,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
     {
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
-        System.out.println(image.getTitle());
-        System.out.println(image.getId());
-        System.out.println("-----------------in deleteImage()-----------------");
-        //db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_PUBLISHED_DATE + "= ?", new String[] {image.getPublishedDate()});
         try {
             db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_ID + "= ?", new String[]{Long.toString(image.getId())});
         } catch (Exception e) {
@@ -179,9 +175,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         db = dbOpener.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("TITLE", image.getTitle());
-        System.out.println(image.getTitle());
-        System.out.println(image.getId());
-        System.out.println("-----------------in updateImageTitle()-----------------");
         //db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_PUBLISHED_DATE + "= ?", new String[] {image.getPublishedDate()});
         try {
             db.update(DB_Opener.TABLE_NAME, cv, DB_Opener.COL_ID + "= ?", new String[]{Long.toString(image.getId())});

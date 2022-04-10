@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
 
         //load any saved favourites from database
-        loadDataFromDatabase();
+        loadDataFromDatabase(false);
 
         calendar = Calendar.getInstance();
 
@@ -130,16 +130,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 Iterator favImagesIterator = favNasaImages.iterator();
                 while (favImagesIterator.hasNext()) {
                     NasaImage nasaImage = (NasaImage) favImagesIterator.next();
-                    System.out.println(nasaImage.getTitle());
 
                     //if image is already in favourites list, exit method without adding it again
-                    if ( activeImage.getTitle().equals(nasaImage.getTitle()) ) {
+                    if ( activeImage.getPublishedDate().equals(nasaImage.getPublishedDate()) ) {
                         return;
                     }
                 }
-                //otherwise, add image to favourites ArrayList
-                favNasaImages.add(activeImage);
-
                 //and write information to the database
                 ContentValues newRowValues = new ContentValues();
 
@@ -152,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 db.insert(DB_Opener.TABLE_NAME, null, newRowValues);
 
                 //reload from database to get auto-generated ID for new favourited image
-                loadDataFromDatabase();
+                loadDataFromDatabase(true);
             }
         });
 
@@ -216,12 +212,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     String title = imageInfo.getString("title");
                     String imageURL = imageInfo.getString("url");
                     String publishedDate = imageInfo.getString("date");
-                    String explanation = imageInfo.getString("explanation");
 
-                    System.out.println("title: " + title);
-                    System.out.println("url: " + url);
-                    System.out.println("date: " + publishedDate);
-                    System.out.println("explanation: " + explanation);
+                    String explanation = imageInfo.getString("explanation");
 
                     int lastIndex = imageURL.lastIndexOf('/') + 1;
                     String parsedFileName = imageURL.substring(lastIndex);
@@ -241,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         String fileName = sp_url.getFile();
 
                         String environment_directory = Environment.getExternalStorageDirectory().toString();
-                        System.out.println("environment_directory: " + environment_directory);
 
                         //open the connection
                         HttpURLConnection sp_urlConnection = (HttpURLConnection) sp_url.openConnection();
@@ -288,8 +279,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 String path = directory + "/" + currentImage.getParsedFileName();
 
                 currentImage.setFilePath(path);
-
-                System.out.println(path);
                 Bitmap bmImg = BitmapFactory.decodeFile(path);
                 
                 dailyImageView.setImageBitmap(bmImg);
@@ -351,12 +340,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return false;
     }
 
-    private void loadDataFromDatabase()
+    private void loadDataFromDatabase(boolean isNew)
     {
         //get a database connection:
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
-        System.out.println("------------------In load from database----------------");
 
         // We want to get all of the columns. Look at DB_Opener.java for the definitions:
         String [] columns = {DB_Opener.COL_ID,
@@ -379,8 +367,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         int idColIndex = results.getColumnIndex(DB_Opener.COL_ID);
 
         //iterate over the results, return true if there is a next item:
-        while(results.moveToNext())
-        {
+
+        while (results.moveToNext()) {
             String filename = results.getString(filenameColIndex);
             String title = results.getString(titleColIndex);
             String filepath = results.getString(filepathColIndex);
@@ -388,11 +376,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             String explanation = results.getString(explanationColIndex);
             long id = results.getLong(idColIndex);
 
-            //add the new image to the array list:
-            NasaImage nasaImageFromDB = new NasaImage(title, filename, publishedDate, explanation);
-            nasaImageFromDB.setFilePath(filepath);
-            nasaImageFromDB.setId(id);
-            favNasaImages.add(nasaImageFromDB);
+            if (!isNew) {
+                //add the new image to the array list:
+                NasaImage nasaImageFromDB = new NasaImage(title, filename, publishedDate, explanation);
+                nasaImageFromDB.setFilePath(filepath);
+                nasaImageFromDB.setId(id);
+                favNasaImages.add(nasaImageFromDB);
+            }
+            else {
+                if (results.isLast()) {
+                    NasaImage nasaImageFromDB = new NasaImage(title, filename, publishedDate, explanation);
+                    nasaImageFromDB.setFilePath(filepath);
+                    nasaImageFromDB.setId(id);
+                    favNasaImages.add(nasaImageFromDB);
+                }
+            }
         }
     }
 
@@ -424,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             String filepath = c.getString(3);
             String publishedDate = c.getString(4);
             String explanation = c.getString(5);
-            System.out.println("id: " + id + "filename: " + filename + ", title: " + title +
+            System.out.println("id: " + id + ", filename: " + filename + ", title: " + title +
                     ", filepath: " + filepath + ", publishedDate: " + publishedDate);
             c.moveToNext(); }
 
