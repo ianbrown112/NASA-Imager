@@ -30,6 +30,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
@@ -127,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onClick(View view) {
 
+                String confirm_favourite = "This image has been added to your favourites list";
+
                 Iterator favImagesIterator = favNasaImages.iterator();
                 while (favImagesIterator.hasNext()) {
                     NasaImage nasaImage = (NasaImage) favImagesIterator.next();
@@ -149,7 +152,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 //reload from database to get auto-generated ID for new favourited image
                 loadDataFromDatabase(true);
+
+
+                Snackbar.make(view, confirm_favourite, Snackbar.LENGTH_LONG)
+                        .setAction("Undo", new MyUndoListener())
+                        .show();
             }
+
         });
 
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
@@ -437,5 +446,46 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         c.moveToPosition(-1);
 
         System.out.println("-------DEBUG INFO END-------");
+    }
+    public void removeFavourite(NasaImage image){
+        System.out.println("<------------------In removeFavourite --------------->");
+        System.out.println(image.getTitle());
+        deleteImage(image);
+        favNasaImages.remove(image);
+
+        int index = 0;
+        Iterator favImagesIterator = favNasaImages.iterator();
+        while (favImagesIterator.hasNext()) {
+            index+=1;
+            System.out.println(index);
+            System.out.println("image index: " + image.getId());
+
+            NasaImage nasaImage = (NasaImage) favImagesIterator.next();
+            System.out.println("nasaImage index: " +nasaImage.getId());
+            if ( image.getPublishedDate() == nasaImage.getPublishedDate()) {
+                System.out.println("id's match, remove image from favs array");
+                favNasaImages.remove(index);
+            }
+        }
+    }
+
+    protected void deleteImage(NasaImage image)
+    {
+        System.out.println("<------------------In deleteImage --------------->");
+        DB_Opener dbOpener = new DB_Opener(this);
+        db = dbOpener.getWritableDatabase();
+        try {
+            db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_ID + "= ?", new String[]{Long.toString(image.getId())});
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public class MyUndoListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            removeFavourite(activeImage);
+        }
     }
 }
