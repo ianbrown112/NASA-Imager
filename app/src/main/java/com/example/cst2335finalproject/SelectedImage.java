@@ -100,7 +100,9 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
                 Intent intent_favs = new Intent(SelectedImage.this, FavouritesList.class);
                 intent_favs.putExtras(bundle);
                 startActivity(intent_favs);
+                //Toast.makeText(this, "Image removed from favourites list", Toast.LENGTH_LONG).show();
             }
+
         });
 
 
@@ -141,7 +143,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
                 intent_home.putExtras(bundle);
-                message = "You clicked on the home";
+                //message = "You clicked on the home";
                 startActivity(intent_home);
                 break;
 
@@ -153,7 +155,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
 

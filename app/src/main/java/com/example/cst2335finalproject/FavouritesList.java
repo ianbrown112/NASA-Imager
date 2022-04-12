@@ -163,7 +163,7 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
 }

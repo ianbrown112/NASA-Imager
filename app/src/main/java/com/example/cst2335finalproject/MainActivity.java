@@ -333,14 +333,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
                 intent_home.putExtras(bundle);
-                message = "You clicked on the home";
                 startActivity(intent_home);
                 break;
 
             case R.id.random:
                 Intent intent_random = new Intent(this, RandomImage.class);
                 intent_random.putExtras(bundle);
-                //message = "You clicked on your favourites list";
                 startActivity(intent_random);
                 break;
 
@@ -352,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
 
@@ -456,16 +454,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         int index = 0;
         Iterator favImagesIterator = favNasaImages.iterator();
         while (favImagesIterator.hasNext()) {
-            index+=1;
             System.out.println(index);
-            System.out.println("image index: " + image.getId());
+            System.out.println("publishedDate: " + image.getId());
 
             NasaImage nasaImage = (NasaImage) favImagesIterator.next();
             System.out.println("nasaImage index: " +nasaImage.getId());
-            if ( image.getPublishedDate() == nasaImage.getPublishedDate()) {
+            if ( image.getPublishedDate().equals(nasaImage.getPublishedDate())) {
                 System.out.println("id's match, remove image from favs array");
                 favNasaImages.remove(index);
             }
+            index+=1;
         }
     }
 
