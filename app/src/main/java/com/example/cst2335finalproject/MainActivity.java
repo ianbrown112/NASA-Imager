@@ -7,7 +7,9 @@ import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -63,17 +65,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     SQLiteDatabase db;
     String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
     boolean default_color;
-
+    boolean start = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        default_color = true;
+
+        if ( sharedPref.getBoolean("default_color", false) ) {
+            default_color = false;
+            System.out.println("------------------------default_color is false");
+        }
+        else {
+            System.out.println("------------------------default_color is true");
+        }
 
         //load any saved favourites from database
         loadDataFromDatabase(false);
 
         calendar = Calendar.getInstance();
 
-        setContentView(R.layout.activity_main);
+        if ( default_color ) {
+            setContentView(R.layout.activity_main_light);
+        }
+        else {
+            setContentView(R.layout.activity_main_dark);
+        }
         defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
 
         //get current year, month and day so default image is today's image
@@ -138,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                     //if image is already in favourites list, exit method without adding it again
                     if ( activeImage.getPublishedDate().equals(nasaImage.getPublishedDate()) ) {
+                        Toast.makeText(MainActivity.this, "Image is already favourited", Toast.LENGTH_LONG).show();
                         return;
                     }
                 }
@@ -164,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         });
 
         //get background colour
-        default_color = false;
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
         dailyNASA_Image.execute(NASAurl + today);
 
@@ -324,29 +342,57 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String message = null;
-        //Look at your menu XML file. Put a case for every id in that file:
         System.out.println("Palette changed");
         switch(item.getItemId())
         {
             //what to do when the menu item is selected:
             case R.id.palette:
                 DrawerLayout bgElement = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-                if ( default_color ) {
-                    bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_light_background));
-                    imageTitleView.setTextColor(getColor(R.color.black));
-                    dateText.setTextColor(getColor(R.color.black));
-                    favButton.setImageDrawable(getResources().getDrawable(R.drawable.heart2));
-                    message = "Light palette selected";
-                    default_color = false;
+                SharedPreferences sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                if ( start ) {
+                    if (default_color) {
+                        start = false;
+                        bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_light_background));
+                        imageTitleView.setTextColor(getColor(R.color.black));
+                        dateText.setTextColor(getColor(R.color.black));
+                        favButton.setImageDrawable(getResources().getDrawable(R.drawable.heart2));
+                        message = "Light palette selected";
+                        editor.putBoolean("default_color", false);
+                        editor.apply();
+                        default_color = false;
+                    } else {
+                        start = false;
+                        bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background));
+                        imageTitleView.setTextColor(getColor(R.color.white));
+                        dateText.setTextColor(getColor(R.color.white));
+                        favButton.setImageDrawable(getResources().getDrawable(R.drawable.red_heart));
+                        message = "Dark palette selected";
+                        editor.putBoolean("default_color", true);
+                        editor.apply();
+                        default_color = true;
+                    }
                 }
-                else {
-                    bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background));
-                    imageTitleView.setTextColor(getColor(R.color.white));
-                    dateText.setTextColor(getColor(R.color.white));
-                    favButton.setImageDrawable(getResources().getDrawable(R.drawable.red_heart));
-                    message = "Dark palette selected";
-                    default_color = true;
+                if ( !start ) {
+                    if (default_color) {
+                        bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_light_background));
+                        imageTitleView.setTextColor(getColor(R.color.black));
+                        dateText.setTextColor(getColor(R.color.black));
+                        favButton.setImageDrawable(getResources().getDrawable(R.drawable.heart2));
+                        message = "Light palette selected";
+                        editor.putBoolean("default_color", false);
+                        editor.apply();
+                        default_color = false;
+                    } else {
+                        bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background));
+                        imageTitleView.setTextColor(getColor(R.color.white));
+                        dateText.setTextColor(getColor(R.color.white));
+                        favButton.setImageDrawable(getResources().getDrawable(R.drawable.red_heart));
+                        message = "Dark palette selected";
+                        editor.putBoolean("default_color", true);
+                        editor.apply();
+                        default_color = true;
+                    }
                 }
                 break;
         }
@@ -356,7 +402,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        String message = null;
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("favs", favNasaImages);
         switch(item.getItemId())
@@ -364,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             case R.id.favourite:
                 Intent intent_favs = new Intent(this, FavouritesList.class);
                 intent_favs.putExtras(bundle);
-                //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
             case R.id.home:
@@ -387,7 +431,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
 
