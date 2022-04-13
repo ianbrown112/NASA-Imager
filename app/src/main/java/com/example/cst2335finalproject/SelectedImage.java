@@ -100,7 +100,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
                 Intent intent_favs = new Intent(SelectedImage.this, FavouritesList.class);
                 intent_favs.putExtras(bundle);
                 startActivity(intent_favs);
-                //Toast.makeText(this, "Image removed from favourites list", Toast.LENGTH_LONG).show();
+                Toast.makeText(SelectedImage.this, "Image removed from favourites list", Toast.LENGTH_LONG).show();
             }
 
         });

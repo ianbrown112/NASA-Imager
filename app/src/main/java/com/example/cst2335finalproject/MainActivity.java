@@ -57,10 +57,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     Calendar calendar;
     ImageView dailyImageView;
     TextView imageTitleView;
+    TextView dateText;
     NasaImage activeImage;
     String defaultDate;
     SQLiteDatabase db;
     String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
+    boolean default_color;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //get current year, month and day so default image is today's image
         String today = LocalDate.now().toString();
 
-        TextView dateText = findViewById(R.id.selectedDate);
+        dateText = findViewById(R.id.selectedDate);
         dateText.setText(defaultDate);
 
         //For toolbar:
@@ -161,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         });
 
+        //get background colour
+        default_color = false;
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
         dailyNASA_Image.execute(NASAurl + today);
 
@@ -318,6 +322,39 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String message = null;
+        //Look at your menu XML file. Put a case for every id in that file:
+        System.out.println("Palette changed");
+        switch(item.getItemId())
+        {
+            //what to do when the menu item is selected:
+            case R.id.palette:
+                DrawerLayout bgElement = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+                if ( default_color ) {
+                    bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_light_background));
+                    imageTitleView.setTextColor(getColor(R.color.black));
+                    dateText.setTextColor(getColor(R.color.black));
+                    favButton.setImageDrawable(getResources().getDrawable(R.drawable.heart2));
+                    message = "Light palette selected";
+                    default_color = false;
+                }
+                else {
+                    bgElement.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background));
+                    imageTitleView.setTextColor(getColor(R.color.white));
+                    dateText.setTextColor(getColor(R.color.white));
+                    favButton.setImageDrawable(getResources().getDrawable(R.drawable.red_heart));
+                    message = "Dark palette selected";
+                    default_color = true;
+                }
+                break;
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        return true;
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         String message = null;
         Bundle bundle = new Bundle();
@@ -409,7 +446,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     private void printCursor(Cursor c) {
-
         System.out.println("-------DEBUG INFO START-------");
         //print db version from static db attribute in MainActivity
         System.out.println("db version: " + db.getVersion());
@@ -479,10 +515,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
     public class MyUndoListener implements View.OnClickListener {
-
         @Override
         public void onClick(View v) {
-
             removeFavourite(activeImage);
         }
     }
