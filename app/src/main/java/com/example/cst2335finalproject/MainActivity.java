@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     NasaImage activeImage;
     String defaultDate;
     SQLiteDatabase db;
-    String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
+    String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=8amQa2rTJM3gvL4ABlbVX82xUPCbb5Au0mCyRjJo&date=";
     boolean default_color;
     boolean start = true;
     @Override

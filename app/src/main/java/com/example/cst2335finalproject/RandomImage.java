@@ -55,7 +55,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
     ProgressBar progressBar;
     boolean isRunning;
     SQLiteDatabase db;
-    String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=DgPLcIlnmN0Cwrzcg3e9NraFaYLIDI68Ysc6Zh3d&date=";
+    String NASAurl = "https://api.nasa.gov/planetary/apod?api_key=8amQa2rTJM3gvL4ABlbVX82xUPCbb5Au0mCyRjJo&date=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
