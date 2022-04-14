@@ -130,7 +130,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        String message = null;
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("favs", favNasaImages);
         switch(item.getItemId())
@@ -140,11 +139,17 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
                 intent_favs.putExtras(bundle);
                 startActivity(intent_favs);
                 break;
+
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
                 intent_home.putExtras(bundle);
-                //message = "You clicked on the home";
                 startActivity(intent_home);
+                break;
+
+            case R.id.random:
+                Intent intent_random = new Intent(this, RandomImage.class);
+                intent_random.putExtras(bundle);
+                startActivity(intent_random);
                 break;
 
             case R.id.exit:
@@ -155,7 +160,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
 
@@ -183,5 +187,16 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId())
+        {
+            case R.id.help:
+                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle("Help")
+                        .setMessage(R.string.selected_help).setPositiveButton(android.R.string.ok, null).show();
+                break;
+        }
+        return true;
     }
 }

@@ -293,14 +293,19 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
             case R.id.favourite:
                 Intent intent_favs = new Intent(this, FavouritesList.class);
                 intent_favs.putExtras(bundle);
-                //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
+
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
                 intent_home.putExtras(bundle);
-                message = "You clicked on the home";
                 startActivity(intent_home);
+                break;
+
+            case R.id.random:
+                Intent intent_random = new Intent(this, RandomImage.class);
+                intent_random.putExtras(bundle);
+                startActivity(intent_random);
                 break;
 
             case R.id.exit:
@@ -311,7 +316,6 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
 
@@ -405,5 +409,16 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
         c.moveToPosition(-1);
 
         System.out.println("-------DEBUG INFO END-------");
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId())
+        {
+            case R.id.help:
+                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle("Help")
+                        .setMessage(R.string.random_help).setPositiveButton(android.R.string.ok, null).show();
+                break;
+        }
+        return true;
     }
 }

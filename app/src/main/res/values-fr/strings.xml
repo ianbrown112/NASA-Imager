@@ -3,9 +3,25 @@
     <string name="app_name">NASA Imageur V.1</string>
     <string name="unfavourite_message">Supprimer des favoris</string>
     <string name="yes">Oui</string>
-    <string name="no">No</string>
+    <string name="no">Non</string>
     <string name="open">Ouvrir</string>
     <string name="close">Fermer</string>
     <string name="ok">D\'accord</string>
     <string name="select_date">Sélectionner une date</string>
+    <string name="home">Foyer</string>
+    <string name="favs">Favoris</string>
+    <string name="random">Aléatoire</string>
+    <string name="exit">Quitter</string>
+    <string name="home_help">Utilisez le bouton du cœur pour ajouter une image à votre liste de favoris. Cliquez sur le pingouin pour changer la palette d\'affichage.</string>
+    <string name="favs_help">Utilisez SELECT pour afficher l\'image favorite.</string>
+    <string name="selected_help">Utilisez UNFAVOURITE pour supprimer l\'image de votre liste de favoris. Modifiez le titre en saisissant un nouveau titre dans la case. Faites glisser la description pour en savoir plus.</string>
+    <string name="random_help">Cette activité affiche une image au hasard. Cliquez sur le cœur pour le mettre en favori.</string>
+    <string name="select">Sélect</string>
+    <string name="change_title">Change titre</string>
+    <string name="unfavourite">Supprimez</string>
+    <string name="confirm_favourite">Cette image a été ajoutée à vos favoris</string>
+    <string name="undo">Annuler</string>
+    <string name="already_favourite">L\'image est déjà favorite</string>
+    <string name="light_palette">Palette vife sélectionnée</string>
+    <string name="dark_palette">Palette sombre sélectionnée</string>
 </resources>

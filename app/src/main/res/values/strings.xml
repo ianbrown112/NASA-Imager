@@ -7,4 +7,20 @@
     <string name="close">Close</string>
     <string name="ok">OK</string>
     <string name="select_date">Select date</string>
+    <string name="home">Home</string>
+    <string name="favs">Favourites</string>
+    <string name="random">Random</string>
+    <string name="exit">Exit</string>
+    <string name="home_help">Use the heart button to add image to your favourites list. Click on the penguin to change the display palette.</string>
+    <string name="favs_help">Use SELECT to display the favourited image.</string>
+    <string name="selected_help">Use UNFAVOURITE to remove the image from your favourites list. Change the title by entering a new title in the box. Drag through the description to read more.</string>
+    <string name="random_help">This activity displays an image at random. Click the heart to favourite it.</string>
+    <string name="select">Select</string>
+    <string name="change_title">Change title</string>
+    <string name="unfavourite">Unfavourite</string>
+    <string name="confirm_favourite">This image has been added to your favourites</string>
+    <string name="undo">Undo</string>
+    <string name="already_favourite">Image is already favourited</string>
+    <string name="light_palette">Light palette selected</string>
+    <string name="dark_palette">Dark palette selected</string>
 </resources>

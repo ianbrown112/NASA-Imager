@@ -7,7 +7,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -137,7 +139,6 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        String message = null;
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("favs", favNasaImages);
         switch(item.getItemId())
@@ -145,14 +146,19 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
             case R.id.favourite:
                 Intent intent_favs = new Intent(this, FavouritesList.class);
                 intent_favs.putExtras(bundle);
-                //message = "You clicked on your favourites list";
                 startActivity(intent_favs);
                 break;
+
             case R.id.home:
                 Intent intent_home = new Intent(this, MainActivity.class);
                 intent_home.putExtras(bundle);
-                message = "You clicked on the home";
                 startActivity(intent_home);
+                break;
+
+            case R.id.random:
+                Intent intent_random = new Intent(this, RandomImage.class);
+                intent_random.putExtras(bundle);
+                startActivity(intent_random);
                 break;
 
             case R.id.exit:
@@ -163,7 +169,18 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
 
-        //Toast.makeText(this, "NavigationDrawer: " + message, Toast.LENGTH_LONG).show();
         return false;
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId())
+        {
+            case R.id.help:
+                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle("Help")
+                        .setMessage(R.string.favs_help).setPositiveButton(android.R.string.ok, null).show();
+                break;
+        }
+        return true;
+    }
+
 }

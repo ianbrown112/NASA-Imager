@@ -18,6 +18,6 @@
         android:layout_height="50dp"
         android:layout_margin="5dp"
         android:textSize="10sp"
-        android:text="SELECT" />
+        android:text="@string/select" />
 
 </LinearLayout>

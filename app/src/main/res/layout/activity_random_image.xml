@@ -38,7 +38,8 @@
             android:id="@+id/favouriteRandom"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/heart" />
+            android:src="@drawable/heart2"
+            android:background="?android:selectableItemBackground"/>
 
         <ProgressBar
             android:id="@+id/progressBar"

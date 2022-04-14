@@ -149,7 +149,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onClick(View view) {
 
-                String confirm_favourite = "This image has been added to your favourites list";
+                String confirm_favourite = getResources().getString(R.string.confirm_favourite);
+                String undo = getResources().getString(R.string.undo);
+                String already_fav = getResources().getString(R.string.already_favourite);
 
                 Iterator favImagesIterator = favNasaImages.iterator();
                 while (favImagesIterator.hasNext()) {
@@ -157,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                     //if image is already in favourites list, exit method without adding it again
                     if ( activeImage.getPublishedDate().equals(nasaImage.getPublishedDate()) ) {
-                        Toast.makeText(MainActivity.this, "Image is already favourited", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, already_fav, Toast.LENGTH_LONG).show();
                         return;
                     }
                 }
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 loadDataFromDatabase(true);
 
                 Snackbar.make(view, confirm_favourite, Snackbar.LENGTH_LONG)
-                        .setAction("Undo", new MyUndoListener())
+                        .setAction(undo, new MyUndoListener())
                         .show();
             }
 
@@ -358,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         imageTitleView.setTextColor(getColor(R.color.black));
                         dateText.setTextColor(getColor(R.color.black));
                         favButton.setImageDrawable(getResources().getDrawable(R.drawable.heart2));
-                        message = "Light palette selected";
+                        message = getResources().getString(R.string.light_palette);
                         editor.putBoolean("default_color", false);
                         editor.apply();
                         default_color = false;
@@ -368,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         imageTitleView.setTextColor(getColor(R.color.white));
                         dateText.setTextColor(getColor(R.color.white));
                         favButton.setImageDrawable(getResources().getDrawable(R.drawable.red_heart));
-                        message = "Dark palette selected";
+                        message = getResources().getString(R.string.dark_palette);
                         editor.putBoolean("default_color", true);
                         editor.apply();
                         default_color = true;
@@ -380,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         imageTitleView.setTextColor(getColor(R.color.black));
                         dateText.setTextColor(getColor(R.color.black));
                         favButton.setImageDrawable(getResources().getDrawable(R.drawable.heart2));
-                        message = "Light palette selected";
+                        message = getResources().getString(R.string.light_palette);
                         editor.putBoolean("default_color", false);
                         editor.apply();
                         default_color = false;
@@ -389,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         imageTitleView.setTextColor(getColor(R.color.white));
                         dateText.setTextColor(getColor(R.color.white));
                         favButton.setImageDrawable(getResources().getDrawable(R.drawable.red_heart));
-                        message = "Dark palette selected";
+                        message = getResources().getString(R.string.dark_palette);
                         editor.putBoolean("default_color", true);
                         editor.apply();
                         default_color = true;
@@ -399,8 +401,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
             case R.id.help:
                 AlertDialog helpAlert = new AlertDialog.Builder(this).setTitle("Help")
-                        .setMessage("Use the heart button to add image to your favourites list. " +
-                                "Click on the penguin to change the display palette.").setPositiveButton(android.R.string.ok, null).show();
+                        .setMessage(R.string.home_help).setPositiveButton(android.R.string.ok, null).show();
                 break;
 
 
