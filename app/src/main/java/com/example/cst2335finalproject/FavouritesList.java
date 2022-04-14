@@ -37,7 +37,6 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favourites_list);
 
-        //For toolbar:
         Toolbar tBar = findViewById(R.id.toolbar);
         setSupportActionBar(tBar);
 
@@ -51,37 +50,16 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
         navigationView.setNavigationItemSelectedListener(this);
         ListView myList = findViewById(R.id.ListView1);
 
+        /** use intent and bundles to retrieve ArrayList of favourite NasaImage objects */
         Intent intent = getIntent();
-
         Bundle favsBundle =  intent.getExtras();
-
         favNasaImages = favsBundle.getParcelableArrayList("favs");
 
-        System.out.println(favNasaImages.size());
-
         myList.setAdapter( myAdapter = new MyListAdapter());
-
-        myList.setOnItemLongClickListener( (p, b, pos, id) -> {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle(getResources().getString(R.string.unfavourite_message))
-
-                    //what the Yes button does:
-                    .setPositiveButton(getResources().getString(R.string.yes), (click, arg) -> {
-                        NasaImage currentImage;
-                        currentImage = myAdapter.getItem(pos);
-                        favNasaImages.remove(currentImage);
-                        myAdapter.notifyDataSetChanged();
-                    })
-                    //What the No button does:
-                    .setNegativeButton(getResources().getString(R.string.no), (click, arg) -> { })
-
-                    //Show the dialog
-                    .create().show();
-            return true;
-        });
     }
-    private class MyListAdapter extends BaseAdapter {
 
+    /** MyListAdapter loads all favourite item lists into view */
+    private class MyListAdapter extends BaseAdapter {
         @Override
         public int getCount() {
             return favNasaImages.size();
@@ -103,29 +81,25 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
             View newView = old;
             LayoutInflater inflater = getLayoutInflater();
 
-            //make a new row:
             if(newView == null) {
                 newView = inflater.inflate(R.layout.list_item, parent, false);
 
             }
-            //set what the text should be for this row:
+
             TextView tView = newView.findViewById(R.id.itemText);
             Button selectBtn = (Button) newView.findViewById(R.id.selectBtn);
             NasaImage nasaImage;
             nasaImage = getItem(position);
             tView.setText( nasaImage.getTitle() );
 
-            //set on click listener for selectBtn to send to next activity
             selectBtn.setOnClickListener( click-> {
                 Intent selectedImage = new Intent(FavouritesList.this, SelectedImage.class);
                 Bundle bundle = new Bundle();
                 bundle.putInt("imageIndex", position);
                 bundle.putParcelableArrayList("favs", favNasaImages);
                 selectedImage.putExtras(bundle);
-                //message = "You clicked on your favourites list";
                 startActivity(selectedImage);
             } );
-            //return it to be put in the table
             return newView;
         }
     };
@@ -176,7 +150,7 @@ public class FavouritesList extends AppCompatActivity implements NavigationView.
         switch(item.getItemId())
         {
             case R.id.help:
-                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle("Help")
+                new android.app.AlertDialog.Builder(this).setTitle(getResources().getString(R.string.help))
                         .setMessage(R.string.favs_help).setPositiveButton(android.R.string.ok, null).show();
                 break;
         }

@@ -61,19 +61,13 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /** isRunning boolean required to stop while loop from running once
+         * we leave activity
+         */
         isRunning = true;
-        //load any saved favourites from database
         loadDataFromDatabase(false);
 
         setContentView(R.layout.activity_random_image);
-
-        //get current year, month and day so default image is today's image
-        String today = LocalDate.now().toString();
-
-        //TextView dateText = findViewById(R.id.selectedDate);
-        //dateText.setText(defaultDate);
-
-        //For toolbar:
         Toolbar tBar = findViewById(R.id.toolbar);
         setSupportActionBar(tBar);
 
@@ -88,10 +82,10 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
 
         randomImageView = findViewById(R.id.randomImage);
 
-        imageTitleView = findViewById(R.id.imageTitle);
+        imageTitleView = findViewById(R.id.randomImageTitle);
 
         progressBar = findViewById(R.id.progressBar);
-        /*Set up favouriting function, with a button to add image to favourites
+        /**Set up favouriting function, with a button to add image to favourites
         and an array list to hold favourited images
          */
 
@@ -115,12 +109,10 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                 while (favImagesIterator.hasNext()) {
                     NasaImage nasaImage = (NasaImage) favImagesIterator.next();
 
-                    //if image is already in favourites list, exit method without adding it again
                     if ( activeImage.getPublishedDate().equals(nasaImage.getPublishedDate()) ) {
                         return;
                     }
                 }
-                //and write information to the database
                 ContentValues newRowValues = new ContentValues();
 
                 newRowValues.put(DB_Opener.COL_FILENAME, activeImage.getParsedFileName());
@@ -131,7 +123,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
 
                 db.insert(DB_Opener.TABLE_NAME, null, newRowValues);
 
-                //reload from database to get auto-generated ID for new favourited image
+                /**reload from database to get auto-generated ID for new favourited image*/
                 loadDataFromDatabase(true);
             }
         });
@@ -144,17 +136,10 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
         protected String doInBackground(String ... args) {
             while ( isRunning ) {
                 try {
-
-                    System.out.println("---------------------------in doInBackground-----------------");
-                    //create a URL object of what server to contact:
-
                     String randomUrl = args[0] + randomDateGenerator();
                     URL url = new URL(randomUrl);
 
-                    //open the connection
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                    //wait for data:
                     InputStream response = urlConnection.getInputStream();
 
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
@@ -167,7 +152,6 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                     }
                     String result = sb.toString();
 
-                    //create JSON object with result
                     JSONObject imageInfo = new JSONObject(result);
 
                     String title = imageInfo.getString("title");
@@ -179,19 +163,14 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                     int lastIndex = imageURL.lastIndexOf('/') + 1;
                     String parsedFileName = imageURL.substring(lastIndex);
 
-                    //check if picture is already saved to drive
-
+                    /** check if picture is already saved to drive */
                     String directory = String.valueOf(getExternalFilesDir(null));
                     String filename = directory + "/" + parsedFileName;
                     File f = new File(filename);
 
-                    //if file does not already exist in storage, download it
                     if (f.isFile() == false) {
 
-                        System.out.println("file does not exist in storage");
                         URL sp_url = new URL(imageURL);
-
-                        //wait for data:
 
                         int count;
 
@@ -204,10 +183,10 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                         while ((count = sp_bufferedInput.read(data)) != -1) {
                             sp_bufferedOutput.write(data, 0, count);
                         }
-                        // flushing output
+                        /** flushing output */
                         sp_bufferedOutput.flush();
 
-                        // closing streams
+                        /** closing streams */
                         sp_bufferedOutput.close();
                         sp_bufferedInput.close();
                     } else {
@@ -222,15 +201,13 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                             e.printStackTrace();
                         }
                     }
-                    //update ImageView to show new cat
+                    /**update ImageView to show new NasaImage*/
                     NasaImage currentNasaImage = new NasaImage(title, parsedFileName, publishedDate, explanation);
                     String path = directory + "/" + parsedFileName;
                     currentNasaImage.setFilePath(path);
-                    System.out.println("--------------file path: " + currentNasaImage.getFilePath());
                     publishProgress(currentNasaImage.getFilePath());
 
                     activeImage = currentNasaImage;
-                    //reset progress bar to 0
                     progressBar.setProgress(0);
                 } catch (Exception e) {
                     System.out.println(e);
@@ -242,17 +219,17 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
 
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate();
-            //update progress bar if input is int
+            /**update progress bar if input is int*/
             try {
                 int i = Integer.parseInt(values[0]);
                 progressBar.setProgress(i);
-                //load new cat picture if string
-
+                /**load new NASA picture if string*/
             } catch (NumberFormatException e) {
                 try {
                     String path = values[0];
                     Bitmap bmImg = BitmapFactory.decodeFile(path);
                     randomImageView.setImageBitmap(bmImg);
+                    imageTitleView.setText(activeImage.getTitle());
                 } catch (Exception e2) {
                     System.out.print(e2);
                 }
@@ -260,10 +237,10 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
-    /* return a date between Jun 16, 1995 and today
+    /** return a date between Jun 16, 1995 and today
     * generating random date based on this post from StackOverflow:
     * https://stackoverflow.com/questions/40253332/generating-random-date-in-a-specific-range-in-java
-    * */
+    */
 
     String randomDateGenerator() {
         Random rand = new Random();
@@ -321,31 +298,26 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
 
     private void loadDataFromDatabase(boolean isNew)
     {
-        //get a database connection:
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
 
-        // We want to get all of the columns. Look at DB_Opener.java for the definitions:
         String [] columns = {DB_Opener.COL_ID,
                 DB_Opener.COL_FILENAME,
                 DB_Opener.COL_TITLE,
                 DB_Opener.COL_FILEPATH,
                 DB_Opener.COL_PUBLISHED_DATE,
                 DB_Opener.COL_EXPLANATION};
-        //query all the results from the database:
+
         Cursor results = db.query(false, DB_Opener.TABLE_NAME, columns, null, null, null, null, null, null);
 
         printCursor(results);
-        //Now the results object has rows of results that match the query.
-        //find the column indices:
+
         int filenameColIndex = results.getColumnIndex(DB_Opener.COL_FILENAME);
         int titleColIndex = results.getColumnIndex(DB_Opener.COL_TITLE);
         int filepathColIndex = results.getColumnIndex(DB_Opener.COL_FILEPATH);
         int publishedDateColIndex = results.getColumnIndex(DB_Opener.COL_PUBLISHED_DATE);
         int explanationColIndex = results.getColumnIndex(DB_Opener.COL_EXPLANATION);
         int idColIndex = results.getColumnIndex(DB_Opener.COL_ID);
-
-        //iterate over the results, return true if there is a next item:
 
         while (results.moveToNext()) {
             String filename = results.getString(filenameColIndex);
@@ -376,23 +348,18 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
     private void printCursor(Cursor c) {
 
         System.out.println("-------DEBUG INFO START-------");
-        //print db version from static db attribute in MainActivity
         System.out.println("db version: " + db.getVersion());
 
-        //get number of columns
         int cols = c.getColumnCount();
         System.out.println("number of columns: " + cols);
 
-        //get names of columns
         for (int i=0; i<cols; i++) {
             System.out.println("column names: " + c.getColumnName(i));
         }
 
-        //get number of results
         int results = c.getCount();
         System.out.println("total number of results: " + results);
 
-        //use cursor to iterate through each row and print out the values
         c.moveToFirst();
         while(!c.isAfterLast() ){
             int id = c.getInt(0);
@@ -405,7 +372,6 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
                     ", filepath: " + filepath + ", publishedDate: " + publishedDate);
             c.moveToNext(); }
 
-        //move cursor back to first row so it can be used to display within the app
         c.moveToPosition(-1);
 
         System.out.println("-------DEBUG INFO END-------");
@@ -415,7 +381,7 @@ public class RandomImage extends AppCompatActivity implements NavigationView.OnN
         switch(item.getItemId())
         {
             case R.id.help:
-                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle("Help")
+                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle(getResources().getString(R.string.help))
                         .setMessage(R.string.random_help).setPositiveButton(android.R.string.ok, null).show();
                 break;
         }

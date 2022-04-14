@@ -4,11 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
-
+/** Code based on lab 5 Databases */
 public class DB_Opener extends SQLiteOpenHelper {
 
-    protected final static String DATABASE_NAME = "ToDoDB";
+    protected final static String DATABASE_NAME = "NasaImageDB";
     protected final static int VERSION_NUM = 1;
     public final static String TABLE_NAME = "NASA_IMAGES";
 

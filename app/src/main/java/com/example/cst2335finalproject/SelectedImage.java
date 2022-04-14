@@ -43,7 +43,6 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_image);
 
-        //For toolbar:
         Toolbar tBar = findViewById(R.id.toolbar);
         setSupportActionBar(tBar);
 
@@ -57,21 +56,14 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         navigationView.setNavigationItemSelectedListener(this);
 
         selectedImageView = findViewById(R.id.selectedImage);
-
         selectedImageTitle = findViewById(R.id.selectedImageTitle);
-
         explanationView = findViewById(R.id.explanationView);
-
         editTitleBox = findViewById(R.id.editTitleBox);
-
         changeTitleBtn = findViewById(R.id.changeTitleBtn);
-
         unfavouriteBtn = findViewById(R.id.unfavouriteBtn);
 
         Intent intent = getIntent();
-
         Bundle bundle =  intent.getExtras();
-
         favNasaImages = bundle.getParcelableArrayList("favs");
 
         int imageIndex = bundle.getInt("imageIndex");
@@ -88,8 +80,8 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        //Create button to allow removal of image from favourites and return to favourites list activity
-        //also removes favourite from table in database
+        /**Create button to allow removal of image from favourites and return to favourites list activity
+        /* also removes favourite from table in database*/
         unfavouriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,7 +99,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
 
 
 
-        //Load all info from selected image into this activity;
+        /**Load all info from selected image into this activity*/
         try {
             String directory = String.valueOf(getExternalFilesDir(null));
             String path = directory + "/" + selectedImage.getParsedFileName();
@@ -163,7 +155,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         return false;
     }
 
-    //method to delete image from database
+    /**method to delete image from database*/
     protected void deleteImage(NasaImage image)
     {
         DB_Opener dbOpener = new DB_Opener(this);
@@ -174,14 +166,14 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
             System.out.println(e);
         }
     }
-    //method to update image title in database
+
+    /**method to update image title in database*/
     protected void updateImageTitle(NasaImage image)
     {
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("TITLE", image.getTitle());
-        //db.delete(DB_Opener.TABLE_NAME, DB_Opener.COL_PUBLISHED_DATE + "= ?", new String[] {image.getPublishedDate()});
         try {
             db.update(DB_Opener.TABLE_NAME, cv, DB_Opener.COL_ID + "= ?", new String[]{Long.toString(image.getId())});
         } catch (Exception e) {
@@ -193,7 +185,7 @@ public class SelectedImage extends AppCompatActivity implements NavigationView.O
         switch(item.getItemId())
         {
             case R.id.help:
-                android.app.AlertDialog helpAlert = new android.app.AlertDialog.Builder(this).setTitle("Help")
+                new android.app.AlertDialog.Builder(this).setTitle(getResources().getString(R.string.help))
                         .setMessage(R.string.selected_help).setPositiveButton(android.R.string.ok, null).show();
                 break;
         }

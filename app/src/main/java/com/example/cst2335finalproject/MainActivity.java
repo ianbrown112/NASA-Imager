@@ -72,20 +72,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
+
+        /**default_color variable allows app to switch between
+         * light and dark palettes depending on user's preference
+         */
         default_color = true;
 
         if ( sharedPref.getBoolean("default_color", false) ) {
             default_color = false;
-            System.out.println("------------------------default_color is false");
         }
-        else {
-            System.out.println("------------------------default_color is true");
-        }
-
-        //load any saved favourites from database
-        loadDataFromDatabase(false);
-
-        calendar = Calendar.getInstance();
 
         if ( default_color ) {
             setContentView(R.layout.activity_main_light);
@@ -93,15 +88,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         else {
             setContentView(R.layout.activity_main_dark);
         }
+
+        /**load any saved favourites from database
+         */
+        loadDataFromDatabase(false);
+
+        calendar = Calendar.getInstance();
+
         defaultDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        //get current year, month and day so default image is today's image
+        /**get current year, month and day so default image is today's image*/
         String today = LocalDate.now().toString();
 
         dateText = findViewById(R.id.selectedDate);
         dateText.setText(defaultDate);
 
-        //For toolbar:
+        /**instantiate toolbar*/
         Toolbar tBar = findViewById(R.id.toolbar);
         setSupportActionBar(tBar);
 
@@ -120,8 +122,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         dateSelectButton=findViewById(R.id.btn1);
 
+        /**dateSelectButton launches calendar fragment so user can select date*/
         dateSelectButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
                 DialogFragment calendarFragment = new CalendarFragment();
@@ -129,15 +131,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         });
 
-        /*Set up favouriting function, with a button to add image to favourites
+        /**Set up favouriting function, with a button to add image to favourites
         and an array list to hold favourited images
          */
 
+        /**if returning to home screen from another activity in app,
+         * use bundle so favourites list persists*/
         try {
             Intent intent = getIntent();
-
             Bundle bundle = intent.getExtras();
-
             favNasaImages = bundle.getParcelableArrayList("favs");
         } catch (Exception e) {
             System.out.println(e);
@@ -154,16 +156,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 String already_fav = getResources().getString(R.string.already_favourite);
 
                 Iterator favImagesIterator = favNasaImages.iterator();
+
+                /**iterate through favourites list, if image already exists in list do
+                 * not add it again*/
                 while (favImagesIterator.hasNext()) {
                     NasaImage nasaImage = (NasaImage) favImagesIterator.next();
-
-                    //if image is already in favourites list, exit method without adding it again
                     if ( activeImage.getPublishedDate().equals(nasaImage.getPublishedDate()) ) {
                         Toast.makeText(MainActivity.this, already_fav, Toast.LENGTH_LONG).show();
                         return;
                     }
                 }
-                //and write information to the database
+                /**and write information to the database if new image*/
                 ContentValues newRowValues = new ContentValues();
 
                 newRowValues.put(DB_Opener.COL_FILENAME, activeImage.getParsedFileName());
@@ -174,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
                 db.insert(DB_Opener.TABLE_NAME, null, newRowValues);
 
-                //reload from database to get auto-generated ID for new favourited image
+                /**reload from database to get auto-generated ID for new favourited image*/
                 loadDataFromDatabase(true);
 
                 Snackbar.make(view, confirm_favourite, Snackbar.LENGTH_LONG)
@@ -184,18 +187,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         });
 
-        //get background colour
+        /**start Asynch function to load default image from web*/
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
         dailyNASA_Image.execute(NASAurl + today);
     }
 
-    /*Calendar code based on tutorial @ https://www.youtube.com/watch?v=33BFCdL0Di0&t=338s
+    /**Calendar code based on tutorial @ https://www.youtube.com/watch?v=33BFCdL0Di0&t=338s
      "DatePickerDialog - Android Studio Tutorial" by Coding in Flow
      Selecting date from calendar updates text box with given date
      */
     @Override
-
-
     public void onDateSet(DatePicker view, int year, int month, int day) {
 
         calendar = Calendar.getInstance();
@@ -218,16 +219,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     protected class DailyNASA_Image extends AsyncTask<String, String, NasaImage> {
+        /**AsyncTask connects to server, downloads image and displays it
+         * modelled after Lab 6 where we loaded Cat images from server*/
         protected NasaImage doInBackground(String ... args) {
                 try {
 
-                    //create a URL object of what server to contact:
+                    /**create a URL object of what server to contact*/
                     URL url = new URL(args[0]);
 
-                    //open the connection
+                    /**open the connection*/
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                    //wait for data:
+                    /**wait for data:*/
                     InputStream response = urlConnection.getInputStream();
 
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
@@ -240,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     }
                     String result = sb.toString();
 
-                    //create JSON object with result
+                    /**create JSON object with result*/
                     JSONObject imageInfo = new JSONObject(result);
 
                     String title = imageInfo.getString("title");
@@ -252,26 +255,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     int lastIndex = imageURL.lastIndexOf('/') + 1;
                     String parsedFileName = imageURL.substring(lastIndex);
 
-                    //check if picture is already saved to drive
+                    /**check if picture is already saved to drive*/
 
                     String directory = String.valueOf(getExternalFilesDir(null));
                     String filename = directory + "/" + parsedFileName;
                     File f = new File(filename);
 
-                    //if file does not already exist in storage, download it
+                    /**if file does not already exist in storage, download it*/
                     if (f.isFile() == false) {
 
                         System.out.println("file does not exist in storage");
                         URL sp_url = new URL(imageURL);
-
-                        String fileName = sp_url.getFile();
-
-                        String environment_directory = Environment.getExternalStorageDirectory().toString();
-
-                        //open the connection
-                        HttpURLConnection sp_urlConnection = (HttpURLConnection) sp_url.openConnection();
-
-                        //wait for data:
 
                         int count;
 
@@ -284,19 +278,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         while ((count = sp_bufferedInput.read(data)) != -1) {
                             sp_bufferedOutput.write(data, 0, count);
                         }
-                        // flushing output
+                        /** flushing output */
                         sp_bufferedOutput.flush();
 
-                        // closing streams
+                        /** closing streams */
                         sp_bufferedOutput.close();
                         sp_bufferedInput.close();
                     } else {
                         System.out.println("file does exist in storage");
                     }
-
                     NasaImage currentNasaImage = new NasaImage(title, parsedFileName, publishedDate, explanation);
-
                     return currentNasaImage;
+
                 } catch (Exception e) {
                     System.out.println(e);
                     System.out.println(e.getStackTrace());
@@ -304,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
              return null;
         }
 
+        /** set ImageView to newly downloaded image once it completes */
         @Override
         protected void onPostExecute(NasaImage currentImage) {
             super.onPostExecute(currentImage);
@@ -326,10 +320,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             }
         }
     }
-    /*convert selected date into proper format for API url
+    /** convert selected date into proper format for API url
     i.e YYYY-MM-DD */
     String API_DateFormatter(int year, int month, int day) {
-        //months are zero-indexed so january=0, add 1 to make compatible index e.g March is set as 2, therefore add 1 to resolve
+        /** months are zero-indexed so january=0, add 1 to make compatible index e.g March is set as 2, therefore add 1 to resolve */
         month = month+1;
         String API_Date = Integer.toString(year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
         return API_Date;
@@ -342,13 +336,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return true;
     }
 
+    /** Sets up items in toolbar to allow help message or switch palette*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String message = null;
-        System.out.println("Palette changed");
         switch(item.getItemId())
         {
-            //what to do when the menu item is selected:
             case R.id.palette:
                 DrawerLayout bgElement = (DrawerLayout) findViewById(R.id.drawer_layout);
                 SharedPreferences sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
@@ -400,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 break;
 
             case R.id.help:
-                AlertDialog helpAlert = new AlertDialog.Builder(this).setTitle("Help")
+                new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.help))
                         .setMessage(R.string.home_help).setPositiveButton(android.R.string.ok, null).show();
                 break;
 
@@ -444,33 +437,31 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return false;
     }
 
+    /** allows loading of favourites from SQLite database
+     * based on Lab 5 of this course
+     * */
     private void loadDataFromDatabase(boolean isNew)
     {
-        //get a database connection:
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
 
-        // We want to get all of the columns. Look at DB_Opener.java for the definitions:
         String [] columns = {DB_Opener.COL_ID,
                 DB_Opener.COL_FILENAME,
                 DB_Opener.COL_TITLE,
                 DB_Opener.COL_FILEPATH,
                 DB_Opener.COL_PUBLISHED_DATE,
                 DB_Opener.COL_EXPLANATION};
-        //query all the results from the database:
+
         Cursor results = db.query(false, DB_Opener.TABLE_NAME, columns, null, null, null, null, null, null);
 
         printCursor(results);
-        //Now the results object has rows of results that match the query.
-        //find the column indices:
+
         int filenameColIndex = results.getColumnIndex(DB_Opener.COL_FILENAME);
         int titleColIndex = results.getColumnIndex(DB_Opener.COL_TITLE);
         int filepathColIndex = results.getColumnIndex(DB_Opener.COL_FILEPATH);
         int publishedDateColIndex = results.getColumnIndex(DB_Opener.COL_PUBLISHED_DATE);
         int explanationColIndex = results.getColumnIndex(DB_Opener.COL_EXPLANATION);
         int idColIndex = results.getColumnIndex(DB_Opener.COL_ID);
-
-        //iterate over the results, return true if there is a next item:
 
         while (results.moveToNext()) {
             String filename = results.getString(filenameColIndex);
@@ -481,7 +472,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             long id = results.getLong(idColIndex);
 
             if (!isNew) {
-                //add the new image to the array list:
+                /** add the new image to the array list: */
                 NasaImage nasaImageFromDB = new NasaImage(title, filename, publishedDate, explanation);
                 nasaImageFromDB.setFilePath(filepath);
                 nasaImageFromDB.setId(id);
@@ -498,25 +489,22 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    /** trouble shooting function to show data loaded from database in console
+     * based on code from Lab 5 */
     private void printCursor(Cursor c) {
         System.out.println("-------DEBUG INFO START-------");
-        //print db version from static db attribute in MainActivity
         System.out.println("db version: " + db.getVersion());
 
-        //get number of columns
         int cols = c.getColumnCount();
         System.out.println("number of columns: " + cols);
 
-        //get names of columns
         for (int i=0; i<cols; i++) {
             System.out.println("column names: " + c.getColumnName(i));
         }
 
-        //get number of results
         int results = c.getCount();
         System.out.println("total number of results: " + results);
 
-        //use cursor to iterate through each row and print out the values
         c.moveToFirst();
         while(!c.isAfterLast() ){
             int id = c.getInt(0);
@@ -529,13 +517,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     ", filepath: " + filepath + ", publishedDate: " + publishedDate);
             c.moveToNext(); }
 
-        //move cursor back to first row so it can be used to display within the app
         c.moveToPosition(-1);
 
         System.out.println("-------DEBUG INFO END-------");
     }
+
+    /** function to remove NasaImage object from ArrayList used in bundle */
     public void removeFavourite(NasaImage image){
-        System.out.println("<------------------In removeFavourite --------------->");
         System.out.println(image.getTitle());
         deleteImage(image);
         favNasaImages.remove(image);
@@ -543,22 +531,16 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         int index = 0;
         Iterator favImagesIterator = favNasaImages.iterator();
         while (favImagesIterator.hasNext()) {
-            System.out.println(index);
-            System.out.println("publishedDate: " + image.getId());
-
             NasaImage nasaImage = (NasaImage) favImagesIterator.next();
-            System.out.println("nasaImage index: " +nasaImage.getId());
             if ( image.getPublishedDate().equals(nasaImage.getPublishedDate())) {
-                System.out.println("id's match, remove image from favs array");
                 favNasaImages.remove(index);
             }
             index+=1;
         }
     }
-
+    /** function to remove NasaImage object data from database */
     protected void deleteImage(NasaImage image)
     {
-        System.out.println("<------------------In deleteImage --------------->");
         DB_Opener dbOpener = new DB_Opener(this);
         db = dbOpener.getWritableDatabase();
         try {
@@ -567,6 +549,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             System.out.println(e);
         }
     }
+
+    /** undo favourite action, applied in SnackBar */
     public class MyUndoListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {

@@ -3,6 +3,10 @@ package com.example.cst2335finalproject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**Parcelable interface allows use of object with bundle,
+ * needed for favourites ArrayList to pass
+ * properly between activities
+ */
 public class NasaImage implements Parcelable {
 
     private String parsedFileName;
@@ -93,6 +97,7 @@ public class NasaImage implements Parcelable {
     public static Parcelable.Creator<NasaImage> CREATOR = new MyCreator();
 }
 
+/** Creator class necessary for Parcelable to function */
 class MyCreator implements Parcelable.Creator<NasaImage> {
 
     @Override

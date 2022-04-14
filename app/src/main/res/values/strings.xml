@@ -23,4 +23,5 @@
     <string name="already_favourite">Image is already favourited</string>
     <string name="light_palette">Light palette selected</string>
     <string name="dark_palette">Dark palette selected</string>
+    <string name="help">Help</string>
 </resources>
