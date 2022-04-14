@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NASA Imageur V.1</string>
+    <string name="unfavourite_message">Supprimer des favoris</string>
+    <string name="yes">Oui</string>
+    <string name="no">No</string>
+    <string name="open">Ouvrir</string>
+    <string name="close">Fermer</string>
+    <string name="ok">D\'accord</string>
+    <string name="select_date">Sélectionner une date</string>
+</resources>

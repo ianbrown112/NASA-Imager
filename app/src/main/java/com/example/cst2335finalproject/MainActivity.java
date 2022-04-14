@@ -5,6 +5,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -174,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 //reload from database to get auto-generated ID for new favourited image
                 loadDataFromDatabase(true);
 
-
                 Snackbar.make(view, confirm_favourite, Snackbar.LENGTH_LONG)
                         .setAction("Undo", new MyUndoListener())
                         .show();
@@ -185,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         //get background colour
         DailyNASA_Image dailyNASA_Image = new DailyNASA_Image();
         dailyNASA_Image.execute(NASAurl + today);
-
     }
 
     /*Calendar code based on tutorial @ https://www.youtube.com/watch?v=33BFCdL0Di0&t=338s
@@ -193,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
      Selecting date from calendar updates text box with given date
      */
     @Override
+
+
     public void onDateSet(DatePicker view, int year, int month, int day) {
 
         calendar = Calendar.getInstance();
@@ -395,6 +396,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     }
                 }
                 break;
+
+            case R.id.help:
+                AlertDialog helpAlert = new AlertDialog.Builder(this).setTitle("Help")
+                        .setMessage("Use the heart button to add image to your favourites list. " +
+                                "Click on the penguin to change the display palette.").setPositiveButton(android.R.string.ok, null).show();
+                break;
+
+
         }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         return true;

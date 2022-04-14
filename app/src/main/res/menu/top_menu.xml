@@ -7,5 +7,10 @@
         android:title="Palette"
         app:showAsAction="always"
         android:orderInCategory="400"/> <!-- This uses showAsAction=never, so look at title= parameter -->
+    <item android:id="@+id/help"
+        android:icon="@drawable/question_mark_black"
+        android:title="Palette"
+        app:showAsAction="always"
+        android:orderInCategory="400"/> <!-- This uses showAsAction=never, so look at title= parameter -->
 
 </menu>

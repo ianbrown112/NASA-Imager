@@ -30,7 +30,7 @@
                     android:id="@+id/btn1"
                     android:layout_width="300dp"
                     android:layout_height="40dp"
-                    android:text="Select Date" />
+                    android:text="@string/select_date" />
 
 
                 <ImageView
